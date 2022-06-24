@@ -18,20 +18,6 @@ export default grapesjs.plugins.add('gjs-grid-system', (editor, opts = {}) => {
     if (!(name in c)) c[name] = defaults[name]
   }
 
-  if (c.default_css) {
-    let css = `
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    overflow: hidden;
-    padding: 5px !important;
-  } 
-  `
-
-    editor.addStyle(css)
-  }
-
   if (c.default_components) {
     editor.on('load', function () {
       editor.BlockManager.remove('column1')
@@ -41,7 +27,7 @@ export default grapesjs.plugins.add('gjs-grid-system', (editor, opts = {}) => {
     })
   }
 
-  editor.BlockManager.add(TYPES.section, blocks.row)
+  editor.BlockManager.add(TYPES.row, blocks.row)
   editor.BlockManager.add(TYPES.column, blocks.column)
 
   const options = {

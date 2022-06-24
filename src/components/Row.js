@@ -1,14 +1,23 @@
 import { ACTIONS, TYPES, MAX_COMPONENTS_LENGTH } from '../consts'
 
 export default (domComponents, { editor }) => {
-  domComponents.addType(TYPES.section, {
+  domComponents.addType(TYPES.row, {
     extend: 'text',
     model: {
       defaults: {
-        name: 'Section',
+        name: 'Row',
         draggable: true, // IT CAN BE DRAGGED INTO these components
         droppable: `[data-gjs-type=${TYPES.column}]`, // these components CAN BE DROPPED INTO IT
-        attributes: { class: 'container' },
+        attributes: {
+          'data-dm-category': 'layout',
+        },
+        styles: `
+        [data-gjs-type="${TYPES.row}"] {
+          width: 100%;
+          margin-left: auto;
+          margin-right: auto;
+          overflow: hidden;
+        } `,
       },
       init() {
         editor.on('component:add', (component) => {

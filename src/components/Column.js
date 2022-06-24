@@ -11,19 +11,20 @@ export default (domComponents, { editor }) => {
           'data-dm-category': 'layout',
         },
         styles: `
-          [data-columns="1"] {width: 8.33%;}
-          [data-columns="2"] {width: 16.66%;}
-          [data-columns="3"] {width: 24.99%;}
-          [data-columns="4"] {width: 33.32%;}
-          [data-columns="5"] {width: 41.65%;}
-          [data-columns="6"] {width: 49.98%;}
-          [data-columns="7"] {width: 58.31%;}
-          [data-columns="8"] {width: 66.64%;}
-          [data-columns="9"] {width: 74.97%;}
-          [data-columns="10"] {width: 83.30%;}
-          [data-columns="11"] {width: 91.63%;}
-          [data-columns="12"] {width: 99.96%;}
-          [data-columns]{ float: left; min-height: 0.125rem; }`,
+          [data-gjs-type="${TYPES.column}"]{ float: left; min-height: 0.125rem; width:100%; }
+          [data-gs-columns="1"] {width: 8.33%;}
+          [data-gs-columns="2"] {width: 16.66%;}
+          [data-gs-columns="3"] {width: 24.99%;}
+          [data-gs-columns="4"] {width: 33.32%;}
+          [data-gs-columns="5"] {width: 41.65%;}
+          [data-gs-columns="6"] {width: 49.98%;}
+          [data-gs-columns="7"] {width: 58.31%;}
+          [data-gs-columns="8"] {width: 66.64%;}
+          [data-gs-columns="9"] {width: 74.97%;}
+          [data-gs-columns="10"] {width: 83.30%;}
+          [data-gs-columns="11"] {width: 91.63%;}
+          [data-gs-columns="12"] {width: 99.96%;}
+          `,
         resizable: {
           updateTarget: (el, rect, opt) => {
             const deltaX = opt.resizer.delta.x
@@ -69,19 +70,22 @@ export default (domComponents, { editor }) => {
           cr: true,
           cl: true,
         },
-        draggable: `[data-gjs-type=${TYPES.section}]`, // IT CAN BE DRAGGED INTO these components
+        draggable: `[data-gjs-type=${TYPES.row}]`, // IT CAN BE DRAGGED INTO these components
         droppable: true,
       },
+
+      init() {},
 
       setColumns(value) {
         if (!value) return
         const attrs = this.getAttributes()
-        attrs['data-columns'] = value
+        attrs['data-gs-columns'] = value
         this.setAttributes(attrs)
       },
+
       getColumns() {
         const attributes = this.getAttributes()
-        const value = attributes['data-columns']
+        const value = attributes['data-gs-columns']
         let result = value
         if (typeof trait === 'string' && !isNaN(parseInt(value))) result = parseInt(value)
         return result
@@ -90,9 +94,13 @@ export default (domComponents, { editor }) => {
       setSizeClass(size) {
         if (size > 0 && size <= 12) this.setColumns(size)
       },
+
       getSpan() {
-        return this.getColumns() || 12
+        const columns = this.getColumns() || 12
+        console.log('Cols', columns)
+        return columns
       },
+
       getNextSpan(isGrowing) {
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1

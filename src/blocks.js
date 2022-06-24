@@ -1,13 +1,13 @@
 import { TYPES } from './consts'
 
 export const rowBlock = {
-  label: 'Section',
+  label: 'Row',
   category: 'Layout',
   attributes: {
     class: 'gjs-fonts gjs-f-b1',
   },
   content: {
-    type: TYPES.section,
+    type: TYPES.row,
     components: [{ type: TYPES.column }],
   },
 }
