@@ -68,3 +68,8 @@ Start the dev server
 ```sh
 $ npm start
 ```
+
+
+## TODO
+- When the last column is removed delete the parent row
+- Fix bug when dragging column from one row to another
