@@ -21,7 +21,6 @@ export default (domComponents, { editor }) => {
           [data-gjs-type="${type}"] {
             display:table;
             width:100%;
-            vertical-align:top;
           }`,
         stylable: ['height', 'vertical-align', 'break-inside', 'padding'],
       },

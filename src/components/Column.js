@@ -11,10 +11,7 @@ export default (domComponents, { editor }) => {
           'data-dm-category': 'layout',
         },
         styles: `
-          [data-gjs-type="${TYPES.column}"]{
-            height: 120px;
-            vertical-align:inherit; 
-          }
+          [data-gjs-type="${TYPES.column}"]{}
           [data-gs-columns="1"] {width: 8.33%;}
           [data-gs-columns="2"] {width: 16.66%;}
           [data-gs-columns="3"] {width: 24.99%;}
@@ -75,7 +72,16 @@ export default (domComponents, { editor }) => {
         },
         draggable: `[data-gjs-type=${TYPES.row}]`, // IT CAN BE DRAGGED INTO these components
         droppable: true,
-        stylable: ['padding'],
+        stylable: [
+          'padding',
+          'break-inside',
+
+          'background-color',
+          'background-image',
+          'background-size',
+          'background-position',
+          'background-repeat',
+        ],
       },
 
       init() {},

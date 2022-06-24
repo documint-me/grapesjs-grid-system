@@ -17,7 +17,6 @@ export default (domComponents, { editor }) => {
         styles: `
         [data-gjs-type="${type}"] {
           display:table-row;
-          vertical-align: inherit;    
         } `,
       },
       init() {
