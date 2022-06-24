@@ -1,29 +1,26 @@
-import { TYPES, RESIZER_NONE } from '../consts'
+import { TYPES, RESIZER_NONE, MAX_COLUMNS } from '../consts'
 
-export default (domComponents, { editor }) => {
+export default (domComponents, { editor, ...config }) => {
   domComponents.addType(TYPES.column, {
-    extend: 'text',
+    extend: 'cell',
     model: {
       defaults: {
-        tagName: 'div',
+        tagName: 'td',
         name: 'Column',
-        attributes: {
-          'data-dm-category': 'layout',
-        },
         styles: `
-          [data-gjs-type="${TYPES.column}"]{ float: left; min-height: 0.125rem; width:100%; }
-          [data-gs-columns="1"] {width: 8.33%;}
-          [data-gs-columns="2"] {width: 16.66%;}
-          [data-gs-columns="3"] {width: 24.99%;}
-          [data-gs-columns="4"] {width: 33.32%;}
-          [data-gs-columns="5"] {width: 41.65%;}
-          [data-gs-columns="6"] {width: 49.98%;}
-          [data-gs-columns="7"] {width: 58.31%;}
-          [data-gs-columns="8"] {width: 66.64%;}
-          [data-gs-columns="9"] {width: 74.97%;}
-          [data-gs-columns="10"] {width: 83.30%;}
-          [data-gs-columns="11"] {width: 91.63%;}
-          [data-gs-columns="12"] {width: 99.96%;}
+          [data-gjs-type="${TYPES.column}"]{}          
+          [data-gs-columns="1"] {width: 8.3333%;}          
+          [data-gs-columns="2"] {width: 16.6666%;}          
+          [data-gs-columns="3"] {width: 25%;}          
+          [data-gs-columns="4"] {width: 33.3333%;}          
+          [data-gs-columns="5"] {width: 41.6666%;}          
+          [data-gs-columns="6"] {width: 50%;}          
+          [data-gs-columns="7"] {width: 58.3333%;}          
+          [data-gs-columns="8"] {width: 66.6666%;}          
+          [data-gs-columns="9"] {width: 75%;}          
+          [data-gs-columns="10"] {width: 83.3333%;}          
+          [data-gs-columns="11"] {width: 91.6666%;}          
+          [data-gs-columns="12"] {width: 100%;}
           `,
         resizable: {
           updateTarget: (el, rect, opt) => {
@@ -38,7 +35,7 @@ export default (domComponents, { editor }) => {
             const prevDeltaX = Number(selected.get('prevDeltaX') || deltaX)
             const parent = selected.parent()
             const parentEl = parent.getEl()
-            const oneColWidth = parentEl.offsetWidth / 12
+            const oneColWidth = parentEl.offsetWidth / MAX_COLUMNS
             const prevDiv = Math.trunc(prevDeltaX / oneColWidth)
             const div = Math.trunc(deltaX / oneColWidth)
             const mustBeChanged = div !== prevDiv
@@ -55,12 +52,12 @@ export default (domComponents, { editor }) => {
                 return sum
               }, 0)
 
-              if ((spanSum < 12 && grow) || columnForChange) {
-                const selectedNewSpan = selected.getNextSpan(grow)
+              if ((spanSum < MAX_COLUMNS && grow) || columnForChange) {
+                let selectedNewSpan = selected.getNextSpan(grow)
                 selected.setSizeClass(selectedNewSpan)
               }
 
-              if (columnForChange && spanSum === 12) {
+              if (columnForChange && spanSum === MAX_COLUMNS) {
                 const columnForChangeNewSpan = columnForChange.getNextSpan(!grow)
                 columnForChange.setSizeClass(columnForChangeNewSpan)
               }
@@ -72,6 +69,7 @@ export default (domComponents, { editor }) => {
         },
         draggable: `[data-gjs-type=${TYPES.row}]`, // IT CAN BE DRAGGED INTO these components
         droppable: true,
+        ...config.columnProps,
       },
 
       init() {},
@@ -92,12 +90,11 @@ export default (domComponents, { editor }) => {
       },
 
       setSizeClass(size) {
-        if (size > 0 && size <= 12) this.setColumns(size)
+        if (size > 0 && size <= MAX_COLUMNS) this.setColumns(size)
       },
 
       getSpan() {
-        const columns = this.getColumns() || 12
-        console.log('Cols', columns)
+        const columns = this.getColumns() || MAX_COLUMNS
         return columns
       },
 
@@ -105,7 +102,7 @@ export default (domComponents, { editor }) => {
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1
 
-        if (newSpan > 0 && newSpan <= 12) return newSpan
+        if (newSpan > 0 && newSpan <= MAX_COLUMNS) return newSpan
 
         return oldSpan
       },

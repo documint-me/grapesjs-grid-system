@@ -1,28 +1,28 @@
-import { ACTIONS, TYPES, MAX_COMPONENTS_LENGTH } from '../consts'
+import { ACTIONS, TYPES, MAX_COLUMNS } from '../consts'
+const type = TYPES.row
 
-export default (domComponents, { editor }) => {
-  domComponents.addType(TYPES.row, {
-    extend: 'text',
+export default (domComponents, { editor, ...config }) => {
+  domComponents.addType(type, {
+    extend: 'row',
     model: {
       defaults: {
-        name: 'Row',
+        name: 'Columns',
+        tagName: 'tr',
+        selectable: false,
         draggable: true, // IT CAN BE DRAGGED INTO these components
         droppable: `[data-gjs-type=${TYPES.column}]`, // these components CAN BE DROPPED INTO IT
         attributes: {
           'data-dm-category': 'layout',
         },
         styles: `
-        [data-gjs-type="${TYPES.row}"] {
-          width: 100%;
-          margin-left: auto;
-          margin-right: auto;
-          overflow: hidden;
+        [data-gjs-type="${type}"] {
+          display:table-row;
         } `,
       },
       init() {
         editor.on('component:add', (component) => {
           const parent = component.parent()
-          if (parent && parent.components().models.length > MAX_COMPONENTS_LENGTH) {
+          if (parent && parent.components().models.length > MAX_COLUMNS) {
             component.remove()
           }
         })
@@ -43,7 +43,7 @@ export default (domComponents, { editor }) => {
           }
 
           if (action === ACTIONS.removeComponent) {
-            removeComponentHandler(component, components, index)
+            removeComponentHandler(component, components, index, MAX_COLUMNS)
           }
         })
       },
@@ -76,9 +76,9 @@ function addNewComponentHandler(component, components, index) {
   }
 }
 
-function removeComponentHandler(component, components, index) {
+function removeComponentHandler(component, components, index, maxColumns) {
   const { length: componentsLength } = components
-  if (componentsLength >= MAX_COMPONENTS_LENGTH) {
+  if (componentsLength >= maxColumns) {
     return
   }
   const closestIndex = index === componentsLength ? index - 1 : index
