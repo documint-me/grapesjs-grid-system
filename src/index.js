@@ -5,7 +5,7 @@ import loadBlocks from './blocks'
 import defaultOptions from './options'
 import { TYPES } from './consts'
 
-export default grapesjs.plugins.add('gis-grid-system', (editor, opts = {}) => {
+export default grapesjs.plugins.add('gjs-grid-system', (editor, opts = {}) => {
   let c = opts
 
   let defaults = {
@@ -141,7 +141,6 @@ export default grapesjs.plugins.add('gis-grid-system', (editor, opts = {}) => {
   }
 
   editor.BlockManager.add(TYPES.section, blocks.row)
-
   editor.BlockManager.add(TYPES.column, blocks.column)
 
   const options = {
