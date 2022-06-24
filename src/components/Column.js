@@ -2,16 +2,19 @@ import { TYPES, RESIZER_NONE } from '../consts'
 
 export default (domComponents, { editor }) => {
   domComponents.addType(TYPES.column, {
-    extend: 'text',
+    extend: 'cell',
     model: {
       defaults: {
-        tagName: 'div',
+        tagName: 'td',
         name: 'Column',
         attributes: {
           'data-dm-category': 'layout',
         },
         styles: `
-          [data-gjs-type="${TYPES.column}"]{ float: left; min-height: 0.125rem; width:100%; }
+          [data-gjs-type="${TYPES.column}"]{
+            height: 120px;
+            vertical-align:inherit; 
+          }
           [data-gs-columns="1"] {width: 8.33%;}
           [data-gs-columns="2"] {width: 16.66%;}
           [data-gs-columns="3"] {width: 24.99%;}
@@ -72,6 +75,7 @@ export default (domComponents, { editor }) => {
         },
         draggable: `[data-gjs-type=${TYPES.row}]`, // IT CAN BE DRAGGED INTO these components
         droppable: true,
+        stylable: ['padding'],
       },
 
       init() {},

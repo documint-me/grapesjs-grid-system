@@ -1,22 +1,23 @@
 import { ACTIONS, TYPES, MAX_COMPONENTS_LENGTH } from '../consts'
+const type = TYPES.row
 
 export default (domComponents, { editor }) => {
-  domComponents.addType(TYPES.row, {
-    extend: 'text',
+  domComponents.addType(type, {
+    extend: 'row',
     model: {
       defaults: {
-        name: 'Row',
+        name: 'Columns',
+        tagName: 'tr',
+        selectable: false,
         draggable: true, // IT CAN BE DRAGGED INTO these components
         droppable: `[data-gjs-type=${TYPES.column}]`, // these components CAN BE DROPPED INTO IT
         attributes: {
           'data-dm-category': 'layout',
         },
         styles: `
-        [data-gjs-type="${TYPES.row}"] {
-          width: 100%;
-          margin-left: auto;
-          margin-right: auto;
-          overflow: hidden;
+        [data-gjs-type="${type}"] {
+          display:table-row;
+          vertical-align: inherit;    
         } `,
       },
       init() {

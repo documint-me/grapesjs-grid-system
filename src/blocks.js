@@ -1,5 +1,7 @@
 import { TYPES } from './consts'
 
+const { table, row, column } = TYPES
+
 export const rowBlock = {
   label: 'Row',
   category: 'Layout',
@@ -7,8 +9,11 @@ export const rowBlock = {
     class: 'gjs-fonts gjs-f-b1',
   },
   content: {
-    type: TYPES.row,
-    components: [{ type: TYPES.column }],
+    type: table,
+    components: {
+      type: row,
+      components: { type: column },
+    },
   },
 }
 

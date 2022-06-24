@@ -1,6 +1,7 @@
 export const TYPES = {
-  column: 'gs-column',
+  table: 'gs-table',
   row: 'gs-row',
+  column: 'gs-column',
 }
 
 export const MAX_COMPONENTS_LENGTH = 12
