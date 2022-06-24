@@ -2,7 +2,7 @@ import { TYPES } from '../consts'
 
 const type = TYPES.table
 
-export default (domComponents, { editor }) => {
+export default (domComponents, { editor, ...config }) => {
   domComponents.addType(type, {
     extend: 'table',
     model: {
@@ -14,15 +14,12 @@ export default (domComponents, { editor }) => {
         hoverable: true,
         draggable: `.wrapper, [data-gjs-type=${TYPES.column}]`, // IT CAN BE DRAGGED INTO these components
         droppable: false, // these components CAN BE DROPPED INTO IT
-        attributes: {
-          'data-dm-category': 'layout',
-        },
         styles: `
           [data-gjs-type="${type}"] {
             display:table;
             width:100%;
           }`,
-        stylable: ['height', 'vertical-align', 'break-inside', 'padding'],
+        ...config.rowProps,
       },
       init() {},
     },

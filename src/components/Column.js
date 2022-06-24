@@ -1,6 +1,6 @@
 import { TYPES, RESIZER_NONE } from '../consts'
 
-export default (domComponents, { editor }) => {
+export default (domComponents, { editor, ...config }) => {
   domComponents.addType(TYPES.column, {
     extend: 'cell',
     model: {
@@ -72,16 +72,7 @@ export default (domComponents, { editor }) => {
         },
         draggable: `[data-gjs-type=${TYPES.row}]`, // IT CAN BE DRAGGED INTO these components
         droppable: true,
-        stylable: [
-          'padding',
-          'break-inside',
-
-          'background-color',
-          'background-image',
-          'background-size',
-          'background-position',
-          'background-repeat',
-        ],
+        ...config.columnProps,
       },
 
       init() {},
