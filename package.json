@@ -1,7 +1,7 @@
 {
   "name": "@documint/grapesjs-grid-system",
   "license": "MIT",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Grid system for GrapesJS {Sections / columns}",
   "author": "Documint",
   "main": "dist/grapesjs-grid-system.min.js",
