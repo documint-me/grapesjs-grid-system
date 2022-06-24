@@ -1,7 +1,7 @@
-import { ACTIONS, TYPES, MAX_COMPONENTS_LENGTH } from '../consts'
+import { ACTIONS, TYPES, MAX_COLUMNS } from '../consts'
 const type = TYPES.row
 
-export default (domComponents, { editor }) => {
+export default (domComponents, { editor, ...config }) => {
   domComponents.addType(type, {
     extend: 'row',
     model: {
@@ -22,7 +22,7 @@ export default (domComponents, { editor }) => {
       init() {
         editor.on('component:add', (component) => {
           const parent = component.parent()
-          if (parent && parent.components().models.length > MAX_COMPONENTS_LENGTH) {
+          if (parent && parent.components().models.length > MAX_COLUMNS) {
             component.remove()
           }
         })
@@ -43,7 +43,7 @@ export default (domComponents, { editor }) => {
           }
 
           if (action === ACTIONS.removeComponent) {
-            removeComponentHandler(component, components, index)
+            removeComponentHandler(component, components, index, MAX_COLUMNS)
           }
         })
       },
@@ -76,9 +76,9 @@ function addNewComponentHandler(component, components, index) {
   }
 }
 
-function removeComponentHandler(component, components, index) {
+function removeComponentHandler(component, components, index, maxColumns) {
   const { length: componentsLength } = components
-  if (componentsLength >= MAX_COMPONENTS_LENGTH) {
+  if (componentsLength >= maxColumns) {
     return
   }
   const closestIndex = index === componentsLength ? index - 1 : index
