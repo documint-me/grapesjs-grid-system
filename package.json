@@ -1,9 +1,9 @@
 {
   "name": "grapesjs-grid-system",
   "license": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "Grid system for GrapesJS {Sections / columns}",
-  "main": "dist/grapesjs-plugin-grid.min.js",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint src",
     "v:patch": "npm version --no-git-tag-version patch",

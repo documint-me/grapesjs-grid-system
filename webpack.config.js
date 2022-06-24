@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const pkg = require('./package.json');
 const webpack = require('webpack');
 const fs = require('fs');
-const name = 'grapesjs-plugin-grid';
+const name = 'grapesjs-grid-system'
 let plugins = [];
 
 module.exports = (env = {}) => {
