@@ -1,4 +1,4 @@
-import { TYPES, RESIZER_NONE, MAX_COLUMNS } from '../consts'
+import { TYPES, RESIZER_NONE, MAX_COLUMNS, RESIZABLE_PROPS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   domComponents.addType(TYPES.column, {
@@ -23,45 +23,95 @@ export default (domComponents, { editor, ...config }) => {
           [data-gs-columns="12"] {width: 100%;}
           `,
         resizable: {
+          onEnd: (...args) => {
+            const selected = editor.getSelected();
+            selected.set(RESIZABLE_PROPS.startX, undefined);
+            selected.set(RESIZABLE_PROPS.prevX, undefined);
+            selected.set(RESIZABLE_PROPS.prevDirection, undefined);
+            selected.set(RESIZABLE_PROPS.prevDeltaX, undefined);
+            editor.Canvas.toggleFramesEvents(1);
+          },
           updateTarget: (el, rect, opt) => {
-            const deltaX = opt.resizer.delta.x
-            const side = opt.resizer.handlerAttr === 'cr' ? 'right' : 'left'
-            const selected = editor.getSelected()
-
-            if (!selected) {
-              return
+            editor.UndoManager.stop();
+            const { currentPos, handlerAttr } = opt.resizer;
+            const { x: currentX } = currentPos;
+            const selected = editor.getSelected();
+            let startX = Number(selected.get(RESIZABLE_PROPS.startX));
+            if (!startX) {
+              startX = currentX;
+              selected.set(RESIZABLE_PROPS.startX, startX);
             }
 
-            const prevDeltaX = Number(selected.get('prevDeltaX') || deltaX)
-            const parent = selected.parent()
-            const parentEl = parent.getEl()
-            const oneColWidth = parentEl.offsetWidth / MAX_COLUMNS
-            const prevDiv = Math.trunc(prevDeltaX / oneColWidth)
-            const div = Math.trunc(deltaX / oneColWidth)
-            const mustBeChanged = div !== prevDiv
-            const grow = (deltaX < 0 && side === 'left') || (deltaX > 0 && side === 'right')
-            const shrink = (deltaX > 0 && side === 'left') || (deltaX < 0 && side === 'right')
+            let prevX = Number(selected.get(RESIZABLE_PROPS.prevX));
+            if (!prevX) {
+              prevX = currentX;
+              selected.set(RESIZABLE_PROPS.prevX, prevX);
+            }
 
-            selected.set('prevDeltaX', deltaX)
+            let prevDirection = selected.get(RESIZABLE_PROPS.prevDirection);
+            let currentDirection = undefined;
+
+            if (currentX > prevX) {
+              currentDirection = 'right';
+            } else if (currentX < prevX) {
+              currentDirection = 'left';
+            } else {
+              currentDirection = prevDirection;
+            }
+
+            if (currentDirection !== prevDirection) {
+              startX = prevX;
+              selected.set(RESIZABLE_PROPS.startX, startX);
+              selected.set(RESIZABLE_PROPS.prevDeltaX, undefined);
+            }
+
+            const side = handlerAttr === 'cr' ? 'right' : 'left';
+            const deltaX = Math.abs(currentX - startX);
+            const prevDeltaX = Number(
+              selected.get(RESIZABLE_PROPS.prevDeltaX) || deltaX
+            );
+            const parent = selected.parent();
+            const parentEl = parent.getEl();
+            const oneColWidth = parentEl.offsetWidth / 12;
+            const prevDiv = Math.trunc(prevDeltaX / oneColWidth);
+            const div = Math.trunc(deltaX / oneColWidth);
+            const mustBeChanged = div !== prevDiv;
+
+            const grow =
+              (currentDirection === 'right' && side === 'right') ||
+              (currentDirection === 'left' && side === 'left');
+            const shrink =
+              (currentDirection === 'right' && side === 'left') ||
+              (currentDirection === 'left' && side === 'right');
 
             if ((shrink || grow) && mustBeChanged) {
-              const columnForChange = selected.getNextColumnForChange(side, grow)
+              const columnForChange = selected.getNextColumnForChange(
+                side,
+                grow
+              );
 
               const spanSum = parent.components().models.reduce((sum, col) => {
-                sum += col.getSpan()
-                return sum
-              }, 0)
-
-              if ((spanSum < MAX_COLUMNS && grow) || columnForChange) {
-                let selectedNewSpan = selected.getNextSpan(grow)
-                selected.setSizeClass(selectedNewSpan)
+                sum += col.getSpan();
+                return sum;
+              }, 0);
+              editor.UndoManager.start();
+              if ((spanSum < 12 && grow) || columnForChange) {
+                const selectedNewSpan = selected.getNextSpan(grow);
+                selected.setSizeClass(selectedNewSpan);
               }
 
-              if (columnForChange && spanSum === MAX_COLUMNS) {
-                const columnForChangeNewSpan = columnForChange.getNextSpan(!grow)
-                columnForChange.setSizeClass(columnForChangeNewSpan)
+              if (columnForChange && spanSum === 12) {
+                const columnForChangeNewSpan = columnForChange.getNextSpan(
+                  !grow
+                );
+                columnForChange.setSizeClass(columnForChangeNewSpan);
               }
             }
+            editor.UndoManager.stop();
+
+            selected.set(RESIZABLE_PROPS.prevX, currentX);
+            selected.set(RESIZABLE_PROPS.prevDirection, currentDirection);
+            selected.set(RESIZABLE_PROPS.prevDeltaX, deltaX);
           },
           ...RESIZER_NONE,
           cr: true,
