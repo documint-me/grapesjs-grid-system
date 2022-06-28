@@ -1,4 +1,4 @@
-import { TYPES } from './consts'
+import { TYPES, BLOCKS } from './consts'
 
 const { table, row, column } = TYPES
 
@@ -26,9 +26,12 @@ export const columnBlock = {
   content: { type: TYPES.column },
 }
 
-export default (editor) => {
+export default (editor, options) => {
   const bm = editor.BlockManager
 
-  bm.add('row', rowBlock)
-  bm.add('column', columnBlock)
+  const { blocks = [] } = options
+
+  if (!blocks || !Array.isArray(blocks)) return
+  if (blocks.includes(BLOCKS.row)) bm.add(BLOCKS.row, blocks.row)
+  if (blocks.includes(BLOCKS.column)) bm.add(BLOCKS.column, blocks.column)
 }

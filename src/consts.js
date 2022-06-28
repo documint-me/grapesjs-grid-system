@@ -4,6 +4,11 @@ export const TYPES = {
   column: 'gs-column',
 }
 
+export const BLOCKS = {
+  row: 'gs-row',
+  column: 'gs-column',
+}
+
 export const MAX_COLUMNS = 12
 
 export const ACTIONS = {
@@ -22,4 +27,4 @@ export const RESIZABLE_PROPS = {
   prevX: 'prevX',
   prevDirection: 'prevDirection',
   prevDeltaX: 'prevDeltaX',
-};
+}

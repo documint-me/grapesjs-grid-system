@@ -1,5 +1,5 @@
 {
-  "name": "grapesjs-grid-system",
+  "name": "@documint/grapesjs-grid-system",
   "license": "MIT",
   "version": "0.0.5",
   "description": "Grid system for GrapesJS {Sections / columns}",
