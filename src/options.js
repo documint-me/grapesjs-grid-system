@@ -3,9 +3,10 @@ import { BLOCKS } from './consts'
 export default {
   blocks: [BLOCKS.row, BLOCKS.column],
 
-  rowBlock: {},
+  tableProps: {},
   rowProps: {},
-
-  columnBlock: {},
   columnProps: {},
+
+  rowBlock: {},
+  columnBlock: {},
 }
