@@ -11,14 +11,6 @@ export default (domComponents, { editor, ...config }) => {
         tagName: 'td',
         name: 'Column',
         resizable: {
-          onEnd: (...args) => {
-            const selected = editor.getSelected()
-            selected.set(RESIZABLE_PROPS.startX, undefined)
-            selected.set(RESIZABLE_PROPS.prevX, undefined)
-            selected.set(RESIZABLE_PROPS.prevDirection, undefined)
-            selected.set(RESIZABLE_PROPS.prevDeltaX, undefined)
-            editor.Canvas.toggleFramesEvents(1)
-          },
           updateTarget: (el, rect, opt) => {
             editor.UndoManager.stop()
             const { currentPos, handlerAttr } = opt.resizer
@@ -91,6 +83,14 @@ export default (domComponents, { editor, ...config }) => {
             selected.set(RESIZABLE_PROPS.prevX, currentX)
             selected.set(RESIZABLE_PROPS.prevDirection, currentDirection)
             selected.set(RESIZABLE_PROPS.prevDeltaX, deltaX)
+            
+            if(opt.store == 1){
+              const selected = editor.getSelected()
+              selected.set(RESIZABLE_PROPS.startX, undefined)
+              selected.set(RESIZABLE_PROPS.prevX, undefined)
+              selected.set(RESIZABLE_PROPS.prevDirection, undefined)
+              selected.set(RESIZABLE_PROPS.prevDeltaX, undefined)
+            }
           },
           ...RESIZER_NONE,
           cr: true,
