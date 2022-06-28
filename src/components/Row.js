@@ -12,7 +12,7 @@ export default (domComponents, { editor, ...config }) => {
         tagName: 'tr',
         selectable: false,
         draggable: false, // IT CAN BE DRAGGED INTO these components
-        droppable: `[data-gjs-type=${TYPES.column}]`, // these components CAN BE DROPPED INTO IT
+        droppable: `[data-gs-type="column"]`, // these components CAN BE DROPPED INTO IT
       },
       init() {
         editor.on('component:add', (component) => {
@@ -51,8 +51,13 @@ export default (domComponents, { editor, ...config }) => {
 
   // Force defaults
   const { attributes = {}, styles = '' } = def.model.defaults
-
-  def.model.defaults.styles = styles + ` [data-gs-type="columns"] { display:table-row; }`
+  const defaultStyles = `
+    [data-gs-type="columns"] { 
+      display:table-row;
+      vertical-align: inherit;
+      break-inside: auto;
+    }`
+  def.model.defaults.styles = styles + defaultStyles
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'columns' }
 
   domComponents.addType(type, def)

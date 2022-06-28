@@ -96,7 +96,7 @@ export default (domComponents, { editor, ...config }) => {
           cr: true,
           cl: true,
         },
-        draggable: `[data-gjs-type=${TYPES.row}]`, // IT CAN BE DRAGGED INTO these components
+        draggable: `[data-gs-type="columns"]`, // IT CAN BE DRAGGED INTO these components
         droppable: true,
         ...config.columnProps,
       },
@@ -167,10 +167,8 @@ export default (domComponents, { editor, ...config }) => {
 
   // Force defaults
   const { attributes = {}, styles = '' } = def.model.defaults
-  def.model.defaults.styles =
-    styles +
-    ` 
-    [data-gs-type="column"]{}          
+  const defaultStyles = ` 
+    [data-gs-type="column"]{ vertical-align: inherit; }          
     [data-gs-columns="1"] {width: 8.3333%;}          
     [data-gs-columns="2"] {width: 16.6666%;}          
     [data-gs-columns="3"] {width: 25%;}          
@@ -183,7 +181,8 @@ export default (domComponents, { editor, ...config }) => {
     [data-gs-columns="10"] {width: 83.3333%;}          
     [data-gs-columns="11"] {width: 91.6666%;}          
     [data-gs-columns="12"] {width: 100%;}
-    `
+  `
+  def.model.defaults.styles = styles + defaultStyles
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'column' }
 
   domComponents.addType(type, def)

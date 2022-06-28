@@ -13,7 +13,7 @@ export default (domComponents, { editor, ...config }) => {
         badgable: true,
         selectable: true,
         hoverable: true,
-        draggable: `.wrapper, [data-gjs-type=${TYPES.column}]`, // IT CAN BE DRAGGED INTO these components
+        draggable: true, // IT CAN BE DRAGGED INTO these components
         droppable: false, // these components CAN BE DROPPED INTO IT
         resizable: { tl: 0, tc: 0, tr: 0, cr: 0, br: 0, bc: 1, bl: 0, cl: 0 },
         ...config.rowProps,
@@ -28,7 +28,9 @@ export default (domComponents, { editor, ...config }) => {
 
   // Force default styles
   const { styles = '', attributes } = def.model.defaults
-  def.model.defaults.styles = styles + ` [data-gs-type="row"] { display:table; width:100%;}`
+  const defaultStyles = ` [data-gs-type="row"] { display:table; width:100%;}`
+
+  def.model.defaults.styles = styles + defaultStyles
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'row' }
 
   domComponents.addType(type, def)
