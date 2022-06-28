@@ -1,23 +1,18 @@
 import { ACTIONS, TYPES, MAX_COLUMNS } from '../consts'
-const type = TYPES.row
 
 export default (domComponents, { editor, ...config }) => {
-  domComponents.addType(type, {
+  const { rowProps = {} } = config
+  const type = rowProps.type || TYPES.row
+
+  const def = {
     extend: 'row',
     model: {
       defaults: {
         name: 'Columns',
         tagName: 'tr',
         selectable: false,
-        draggable: true, // IT CAN BE DRAGGED INTO these components
+        draggable: false, // IT CAN BE DRAGGED INTO these components
         droppable: `[data-gjs-type=${TYPES.column}]`, // these components CAN BE DROPPED INTO IT
-        attributes: {
-          'data-dm-category': 'layout',
-        },
-        styles: `
-        [data-gjs-type="${type}"] {
-          display:table-row;
-        } `,
       },
       init() {
         editor.on('component:add', (component) => {
@@ -52,7 +47,15 @@ export default (domComponents, { editor, ...config }) => {
       // return el.dataset && el.dataset.gjsType === TYPES.section;
       return false
     },
-  })
+  }
+
+  // Force defaults
+  const { attributes = {}, styles = '' } = def.model.defaults
+
+  def.model.defaults.styles = styles + ` [data-gs-type="columns"] { display:table-row; }`
+  def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'columns' }
+
+  domComponents.addType(type, def)
 }
 
 function addNewComponentHandler(component, components, index) {

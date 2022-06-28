@@ -1,9 +1,10 @@
 import { TYPES } from '../consts'
 
-const type = TYPES.table
-
 export default (domComponents, { editor, ...config }) => {
-  domComponents.addType(type, {
+  const { tableProps = {} } = config
+  const type = tableProps.type || TYPES.table
+
+  const def = {
     extend: 'table',
     model: {
       defaults: {
@@ -14,11 +15,7 @@ export default (domComponents, { editor, ...config }) => {
         hoverable: true,
         draggable: `.wrapper, [data-gjs-type=${TYPES.column}]`, // IT CAN BE DRAGGED INTO these components
         droppable: false, // these components CAN BE DROPPED INTO IT
-        styles: `
-          [data-gjs-type="${type}"] {
-            display:table;
-            width:100%;
-          }`,
+        resizable: { tl: 0, tc: 0, tr: 0, cr: 0, br: 0, bc: 1, bl: 0, cl: 0 },
         ...config.rowProps,
       },
       init() {},
@@ -27,5 +24,12 @@ export default (domComponents, { editor, ...config }) => {
       // return el.dataset && el.dataset.gjsType === TYPES.section;
       return false
     },
-  })
+  }
+
+  // Force default styles
+  const { styles = '', attributes } = def.model.defaults
+  def.model.defaults.styles = styles + ` [data-gs-type="row"] { display:table; width:100%;}`
+  def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'row' }
+
+  domComponents.addType(type, def)
 }
