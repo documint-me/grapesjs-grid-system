@@ -1,12 +1,18 @@
 export const TYPES = {
-  table: 'gs-table',
   row: 'gs-row',
+  columns: 'gs-columns',
   column: 'gs-column',
 }
 
 export const BLOCKS = {
   row: 'gs-row',
   column: 'gs-column',
+}
+
+export const GS_TYPES = {
+  row: 'row',
+  columns: 'columns',
+  column: 'column',
 }
 
 export const MAX_COLUMNS = 12

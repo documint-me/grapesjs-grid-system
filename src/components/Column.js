@@ -1,8 +1,9 @@
-import { TYPES, RESIZER_NONE, MAX_COLUMNS, RESIZABLE_PROPS } from '../consts'
+import { TYPES, GS_TYPES, RESIZER_NONE, MAX_COLUMNS, RESIZABLE_PROPS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   const { columnProps = {} } = config
   const type = columnProps.type || TYPES.column
+  const gsType = GS_TYPES.column
 
   const def = {
     extend: 'cell',
@@ -10,6 +11,8 @@ export default (domComponents, { editor, ...config }) => {
       defaults: {
         tagName: 'td',
         name: 'Column',
+        draggable: `[data-gs-type="${GS_TYPES.columns}"]`, // this can be DRAGGED INTO THESE components
+        droppable: true, // these components can be DROPPED INTO THIS one
         resizable: {
           updateTarget: (el, rect, opt) => {
             editor.UndoManager.stop()
@@ -83,8 +86,8 @@ export default (domComponents, { editor, ...config }) => {
             selected.set(RESIZABLE_PROPS.prevX, currentX)
             selected.set(RESIZABLE_PROPS.prevDirection, currentDirection)
             selected.set(RESIZABLE_PROPS.prevDeltaX, deltaX)
-            
-            if(opt.store == 1){
+
+            if (opt.store == 1) {
               const selected = editor.getSelected()
               selected.set(RESIZABLE_PROPS.startX, undefined)
               selected.set(RESIZABLE_PROPS.prevX, undefined)
@@ -96,8 +99,6 @@ export default (domComponents, { editor, ...config }) => {
           cr: true,
           cl: true,
         },
-        draggable: `[data-gs-type="columns"]`, // IT CAN BE DRAGGED INTO these components
-        droppable: true,
         ...config.columnProps,
       },
 
@@ -159,8 +160,7 @@ export default (domComponents, { editor, ...config }) => {
       },
     },
 
-    isComponent(el) {
-      // return el.dataset && el.dataset.gjsType === type;
+    isComponent() {
       return false
     },
   }
@@ -168,7 +168,7 @@ export default (domComponents, { editor, ...config }) => {
   // Force defaults
   const { attributes = {}, styles = '' } = def.model.defaults
   const defaultStyles = ` 
-    [data-gs-type="column"]{ vertical-align: inherit; }          
+    [data-gs-type="${gsType}"]{ vertical-align: inherit; }          
     [data-gs-columns="1"] {width: 8.3333%;}          
     [data-gs-columns="2"] {width: 16.6666%;}          
     [data-gs-columns="3"] {width: 25%;}          
@@ -183,7 +183,7 @@ export default (domComponents, { editor, ...config }) => {
     [data-gs-columns="12"] {width: 100%;}
   `
   def.model.defaults.styles = styles + defaultStyles
-  def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'column' }
+  def.model.defaults.attributes = { ...attributes, 'data-gs-type': gsType }
 
   domComponents.addType(type, def)
 }

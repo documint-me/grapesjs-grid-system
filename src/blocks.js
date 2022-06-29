@@ -1,6 +1,6 @@
 import { TYPES, BLOCKS } from './consts'
 
-const { table, row, column } = TYPES
+const { columns, row, column } = TYPES
 
 export const rowBlock = {
   label: 'Row',
@@ -9,9 +9,9 @@ export const rowBlock = {
     class: 'gjs-fonts gjs-f-b1',
   },
   content: {
-    type: table,
+    type: row,
     components: {
-      type: row,
+      type: columns,
       components: { type: column },
     },
   },
@@ -32,6 +32,6 @@ export default (editor, options) => {
   const { blocks = [] } = options
 
   if (!blocks || !Array.isArray(blocks)) return
-  if (blocks.includes(BLOCKS.row)) bm.add(BLOCKS.row, blocks.row)
-  if (blocks.includes(BLOCKS.column)) bm.add(BLOCKS.column, blocks.column)
+  if (blocks.includes(BLOCKS.row)) bm.add(BLOCKS.row, rowBlock)
+  if (blocks.includes(BLOCKS.column)) bm.add(BLOCKS.column, columnBlock)
 }
