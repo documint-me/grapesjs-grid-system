@@ -1,14 +1,16 @@
 import { TYPES, RESIZER_NONE, MAX_COLUMNS } from '../consts'
+import { elHasClass } from './utils'
+
+const type = TYPES.column
 
 export default (domComponents, { editor, ...config }) => {
-  domComponents.addType(TYPES.column, {
+  domComponents.addType(type, {
     extend: 'cell',
     model: {
       defaults: {
         tagName: 'td',
         name: 'Column',
-        styles: `
-          [data-gjs-type="${TYPES.column}"]{}          
+        styles: `        
           [data-gs-columns="1"] {width: 8.3333%;}          
           [data-gs-columns="2"] {width: 16.6666%;}          
           [data-gs-columns="3"] {width: 25%;}          
@@ -72,7 +74,9 @@ export default (domComponents, { editor, ...config }) => {
         ...config.columnProps,
       },
 
-      init() {},
+      init() {
+        this.get('classes').pluck('name').indexOf(type) < 0 && this.addClass(type);
+      },
 
       setColumns(value) {
         if (!value) return
@@ -85,7 +89,7 @@ export default (domComponents, { editor, ...config }) => {
         const attributes = this.getAttributes()
         const value = attributes['data-gs-columns']
         let result = value
-        if (typeof trait === 'string' && !isNaN(parseInt(value))) result = parseInt(value)
+        if (typeof value === 'string' && !isNaN(parseInt(value))) result = parseInt(value)
         return result
       },
 
@@ -132,7 +136,7 @@ export default (domComponents, { editor, ...config }) => {
 
     isComponent(el) {
       // return el.dataset && el.dataset.gjsType === TYPES.column;
-      return false
+      if (elHasClass(el, type)) return { type };
     },
   })
 }
