@@ -1,7 +1,9 @@
 import { ACTIONS, TYPES, MAX_COLUMNS } from '../consts'
+import { elHasClass } from './utils'
+
 const type = TYPES.row
 
-export default (domComponents, { editor, ...config }) => {
+export default (domComponents, { editor }) => {
   domComponents.addType(type, {
     extend: 'row',
     model: {
@@ -14,12 +16,13 @@ export default (domComponents, { editor, ...config }) => {
         attributes: {
           'data-dm-category': 'layout',
         },
-        styles: `
-        [data-gjs-type="${type}"] {
-          display:table-row;
-        } `,
       },
       init() {
+        const css = editor.Css;
+        this.get('classes').pluck('name').indexOf(type) < 0 && this.addClass(type);
+        css.getRule(`.${type}`) || css.setRule(`.${type}`, {
+          display: 'table-row',
+        });
         editor.on('component:add', (component) => {
           const parent = component.parent()
           if (parent && parent.components().models.length > MAX_COLUMNS) {
@@ -50,7 +53,7 @@ export default (domComponents, { editor, ...config }) => {
     },
     isComponent(el) {
       // return el.dataset && el.dataset.gjsType === TYPES.section;
-      return false
+      if (elHasClass(el, type)) return { type };
     },
   })
 }
