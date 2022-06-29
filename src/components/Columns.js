@@ -2,7 +2,7 @@ import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   const { rowProps = {} } = config
-  const componentType = rowProps.type || TYPES.row
+  const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
 
   const def = {

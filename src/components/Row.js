@@ -2,7 +2,8 @@ import { TYPES, GS_TYPES } from '../consts'
 
 export default (domComponents, { ...config }) => {
   const { tableProps = {} } = config
-  const type = tableProps.type || TYPES.table
+  const type = tableProps.type || TYPES.row
+  const gsType = GS_TYPES.row
 
   const def = {
     extend: 'table',
@@ -26,10 +27,10 @@ export default (domComponents, { ...config }) => {
 
   // Force default styles
   const { styles = '', attributes } = def.model.defaults
-  const defaultStyles = ` [data-gs-type="${GS_TYPES.row}"] { display:table; width:100%;}`
+  const defaultStyles = ` [data-gs-type="${gsType}"] { display:table; width:100%;}`
 
   def.model.defaults.styles = styles + defaultStyles
-  def.model.defaults.attributes = { ...attributes, 'data-gs-type': GS_TYPES.row }
+  def.model.defaults.attributes = { ...attributes, 'data-gs-type': gsType }
 
   domComponents.addType(type, def)
 }

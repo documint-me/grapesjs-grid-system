@@ -1,6 +1,6 @@
 export const TYPES = {
-  table: 'gs-table',
   row: 'gs-row',
+  columns: 'gs-columns',
   column: 'gs-column',
 }
 
