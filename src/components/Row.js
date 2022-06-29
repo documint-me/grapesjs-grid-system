@@ -1,104 +1,35 @@
-import { ACTIONS, TYPES, MAX_COLUMNS } from '../consts'
+import { TYPES, GS_TYPES } from '../consts'
 
-export default (domComponents, { editor, ...config }) => {
-  const { rowProps = {} } = config
-  const type = rowProps.type || TYPES.row
+export default (domComponents, { ...config }) => {
+  const { tableProps = {} } = config
+  const type = tableProps.type || TYPES.table
 
   const def = {
-    extend: 'row',
+    extend: 'table',
     model: {
       defaults: {
-        name: 'Columns',
-        tagName: 'tr',
-        selectable: false,
-        draggable: false, // IT CAN BE DRAGGED INTO these components
-        droppable: `[data-gs-type="column"]`, // these components CAN BE DROPPED INTO IT
-      },
-      init() {
-        editor.on('component:add', (component) => {
-          const parent = component.parent()
-          if (parent && parent.components().models.length > MAX_COLUMNS) {
-            component.remove()
-          }
-        })
-
-        // editor.on('component:create', (component) => {
-        //   // if (typeof component.setSizeClass === 'function') {}
-        // })
-
-        this.on('component:update:components', (component, components, update) => {
-          const { action, index } = update
-
-          if (
-            action === ACTIONS.addComponent ||
-            action === ACTIONS.moveComponent ||
-            action === ACTIONS.cloneComponent
-          ) {
-            addNewComponentHandler(component, components, index)
-          }
-
-          if (action === ACTIONS.removeComponent) {
-            removeComponentHandler(component, components, index, MAX_COLUMNS)
-          }
-        })
+        name: 'Row',
+        tagName: 'table',
+        badgable: true,
+        selectable: true,
+        hoverable: true,
+        draggable: true, // this can be DRAGGED INTO THESE components
+        droppable: false, // these components can be DROPPED INTO THIS one
+        resizable: { tl: 0, tc: 0, tr: 0, cr: 0, br: 0, bc: 1, bl: 0, cl: 0 },
+        ...config.rowProps,
       },
     },
-    isComponent(el) {
-      // return el.dataset && el.dataset.gjsType === TYPES.section;
+    isComponent() {
       return false
     },
   }
 
-  // Force defaults
-  const { attributes = {}, styles = '' } = def.model.defaults
-  const defaultStyles = `
-    [data-gs-type="columns"] { 
-      display:table-row;
-      vertical-align: inherit;
-      break-inside: auto;
-    }`
+  // Force default styles
+  const { styles = '', attributes } = def.model.defaults
+  const defaultStyles = ` [data-gs-type="${GS_TYPES.row}"] { display:table; width:100%;}`
+
   def.model.defaults.styles = styles + defaultStyles
-  def.model.defaults.attributes = { ...attributes, 'data-gs-type': 'columns' }
+  def.model.defaults.attributes = { ...attributes, 'data-gs-type': GS_TYPES.row }
 
   domComponents.addType(type, def)
-}
-
-function addNewComponentHandler(component, components, index) {
-  const { models } = components
-  const oldComponents = [...models.slice(index + 1), ...models.slice(0, index).reverse()]
-  let sizeLeft = true
-  let oldComponentIndex = 0
-
-  while (sizeLeft && oldComponentIndex < oldComponents.length) {
-    const oldComponent = oldComponents[oldComponentIndex]
-    const span = oldComponent.getSpan()
-
-    if (span !== 1) {
-      const newSpan = Math.ceil(span / 2)
-      oldComponent.setSizeClass(span - newSpan)
-      component.setSizeClass(newSpan)
-      sizeLeft = false
-    }
-
-    oldComponentIndex++
-  }
-}
-
-function removeComponentHandler(component, components, index, maxColumns) {
-  const { length: componentsLength } = components
-  if (componentsLength >= maxColumns) {
-    return
-  }
-  const closestIndex = index === componentsLength ? index - 1 : index
-  if (index >= 0 && componentsLength > 0) {
-    const closestComponent = components.models[closestIndex]
-    const closestComponentSpan = closestComponent.getSpan()
-    const deletedComponentSpan = component.getSpan()
-    closestComponent.setSizeClass(deletedComponentSpan + closestComponentSpan)
-  } else {
-    const parent = component.parent()
-    parent.append({
-      type: TYPES.column,
-    })
-  }
 }

@@ -32,6 +32,6 @@ export default (editor, options) => {
   const { blocks = [] } = options
 
   if (!blocks || !Array.isArray(blocks)) return
-  if (blocks.includes(BLOCKS.row)) bm.add(BLOCKS.row, blocks.row)
-  if (blocks.includes(BLOCKS.column)) bm.add(BLOCKS.column, blocks.column)
+  if (blocks.includes(BLOCKS.row)) bm.add(BLOCKS.row, rowBlock)
+  if (blocks.includes(BLOCKS.column)) bm.add(BLOCKS.column, columnBlock)
 }

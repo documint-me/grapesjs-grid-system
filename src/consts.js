@@ -9,6 +9,12 @@ export const BLOCKS = {
   column: 'gs-column',
 }
 
+export const GS_TYPES = {
+  row: 'row',
+  columns: 'columns',
+  column: 'column',
+}
+
 export const MAX_COLUMNS = 12
 
 export const ACTIONS = {
