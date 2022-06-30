@@ -27,7 +27,7 @@ export default (domComponents, { ...config }) => {
 
   // Force default styles
   const { styles = '', attributes } = def.model.defaults
-  const defaultStyles = ` [data-gs-type="${gsType}"] { display:table; width:100%;}`
+  const defaultStyles = ` [data-gs-type="${gsType}"] { display:table; width:100%; table-layout:fixed; }`
 
   def.model.defaults.styles = styles + defaultStyles
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': gsType }
