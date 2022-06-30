@@ -108,6 +108,7 @@ export default (domComponents, { editor, ...config }) => {
         if (!value) return
         const attrs = this.getAttributes()
         attrs['data-gs-columns'] = value
+        this.set('columns', value)
         this.setAttributes(attrs)
       },
 
@@ -116,7 +117,8 @@ export default (domComponents, { editor, ...config }) => {
         const value = attributes['data-gs-columns']
         let result = value
         if (typeof trait === 'string' && !isNaN(parseInt(value))) result = parseInt(value)
-        return result
+        const columns = this.get('columns')
+        return columns
       },
 
       setSizeClass(size) {
@@ -168,7 +170,7 @@ export default (domComponents, { editor, ...config }) => {
   // Force defaults
   const { attributes = {}, styles = '' } = def.model.defaults
   const defaultStyles = ` 
-    [data-gs-type="${gsType}"]{ vertical-align: inherit; }          
+    [data-gs-type="${gsType}"]{ vertical-align: inherit; overflow:hidden; word-break:break-word;}          
     [data-gs-columns="1"] {width: 8.3333%;}          
     [data-gs-columns="2"] {width: 16.6666%;}          
     [data-gs-columns="3"] {width: 25%;}          
