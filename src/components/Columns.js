@@ -17,15 +17,20 @@ export default (domComponents, { editor, ...config }) => {
       },
       init() {
         editor.on('component:add', (component) => {
-          const parent = component.parent()
-          if (parent && parent.components().models.length > MAX_COLUMNS) {
-            component.remove()
-          }
+          const parent = component && component.parent && component.parent()
+          const parentComponents = parent && parent.components && parent.components()
+
+          if (!parentComponents) return
+
+          const parentComponentCount = parentComponents.models && parentComponents.models.length
+
+          console.log('parentComponentCount', parentComponentCount)
+
+          // if (parentComponentCount > MAX_COLUMNS) component.remove()
         })
 
         this.on('component:update:components', (component, components, update) => {
           const { action, index } = update
-
           if (
             action === ACTIONS.addComponent ||
             action === ACTIONS.moveComponent ||
@@ -33,7 +38,6 @@ export default (domComponents, { editor, ...config }) => {
           ) {
             addNewComponentHandler(component, components, index)
           }
-
           if (action === ACTIONS.removeComponent) {
             removeComponentHandler(component, components, index, MAX_COLUMNS)
           }
@@ -81,10 +85,10 @@ function addNewComponentHandler(component, components, index) {
 }
 
 function removeComponentHandler(component, components, index, maxColumns) {
+  if (!components) return
   const { length: componentsLength } = components
-  if (componentsLength >= maxColumns) {
-    return
-  }
+  if (componentsLength >= maxColumns) return
+
   const closestIndex = index === componentsLength ? index - 1 : index
   if (index >= 0 && componentsLength > 0) {
     const closestComponent = components.models[closestIndex]
@@ -92,7 +96,8 @@ function removeComponentHandler(component, components, index, maxColumns) {
     const deletedComponentSpan = component.getSpan()
     closestComponent.setSizeClass(deletedComponentSpan + closestComponentSpan)
   } else {
-    const parent = component.parent()
+    if (!parent || !component.parent) return
+    const parent = component.parent && component.parent()
     parent.append({
       type: TYPES.column,
     })

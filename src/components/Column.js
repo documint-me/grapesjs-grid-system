@@ -19,6 +19,9 @@ export default (domComponents, { editor, ...config }) => {
             const { currentPos, handlerAttr } = opt.resizer
             const { x: currentX } = currentPos
             const selected = editor.getSelected()
+
+            if (!selected) return
+
             let startX = Number(selected.get(RESIZABLE_PROPS.startX))
             if (!startX) {
               startX = currentX
@@ -52,6 +55,7 @@ export default (domComponents, { editor, ...config }) => {
             const deltaX = Math.abs(currentX - startX)
             const prevDeltaX = Number(selected.get(RESIZABLE_PROPS.prevDeltaX) || deltaX)
             const parent = selected.parent()
+
             const parentEl = parent.getEl()
             const oneColWidth = parentEl.offsetWidth / 12
             const prevDiv = Math.trunc(prevDeltaX / oneColWidth)
@@ -65,12 +69,18 @@ export default (domComponents, { editor, ...config }) => {
 
             if ((shrink || grow) && mustBeChanged) {
               const columnForChange = selected.getNextColumnForChange(side, grow)
-
-              const spanSum = parent.components().models.reduce((sum, col) => {
+              const components = parent && parent.components && parent.components()
+              if (!components) {
+                console.log('NO COMPONENTS')
+                return
+              }
+              const spanSum = components.models.reduce((sum, col) => {
                 sum += col.getSpan()
                 return sum
               }, 0)
+
               editor.UndoManager.start()
+
               if ((spanSum < 12 && grow) || columnForChange) {
                 const selectedNewSpan = selected.getNextSpan(grow)
                 selected.setSizeClass(selectedNewSpan)
@@ -141,7 +151,14 @@ export default (domComponents, { editor, ...config }) => {
       getNextColumnForChange(side, isGrowing) {
         const columnIndex = this.index()
         const nextIndex = side === 'right' ? columnIndex + 1 : columnIndex - 1
-        const columnsLength = this.parent().components().models.length
+        const parent = this.parent()
+        if (!parent) return
+        const parentsComponents = parent.components()
+
+        if (!parentsComponents) return
+
+        const columnsLength = parentsComponents.models.length
+
         if (nextIndex < 0 || nextIndex >= columnsLength) {
           return
         }
