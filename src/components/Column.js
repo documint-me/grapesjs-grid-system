@@ -112,7 +112,34 @@ export default (domComponents, { editor, ...config }) => {
         ...config.columnProps,
       },
 
-      init() {},
+      init() { 
+
+        editor.on('component:selected', (comp) => {
+          
+          if(comp.get('type') == this.get('type')){
+            const pcomps = comp.parent() && comp.parent().components();
+            const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length-1];
+
+            if(pcomps.length == 1){
+              comp.get('resizable').cr = false;
+              comp.get('resizable').cl = false;
+            }else{
+              if(pcomps.models[0].cid == comp.cid){
+                comp.get('resizable').cr = true;
+                comp.get('resizable').cl = false;
+              }else if(pcomps.models[last].cid == comp.cid){
+                comp.get('resizable').cr = false;
+                comp.get('resizable').cl = true;
+              }else{
+                comp.get('resizable').cr = true;
+                comp.get('resizable').cl = true;
+              }
+            }
+          }
+        });
+        
+
+      },
 
       setColumns(value) {
         if (!value) return
