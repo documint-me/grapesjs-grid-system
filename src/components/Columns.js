@@ -1,4 +1,4 @@
-import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES, TYPES_NEW, MAX_COLUMNS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   const { rowProps = {} } = config
@@ -96,10 +96,10 @@ function removeComponentHandler(component, components, index, maxColumns) {
     const deletedComponentSpan = component.getSpan()
     closestComponent.setSizeClass(deletedComponentSpan + closestComponentSpan)
   } else {
-    if (!parent || !component.parent) return
-    const parent = component.parent && component.parent()
-    parent.append({
-      type: TYPES.column,
-    })
+    if(component.parent() && component.parent().parent()){
+      if(component.get('type') == TYPES_NEW.column_2 && component.parent().get('type') == TYPES.columns && component.parent().parent().get('type') == TYPES_NEW.row_2){
+        component.parent().parent().remove();
+      }
+    }
   }
 }
