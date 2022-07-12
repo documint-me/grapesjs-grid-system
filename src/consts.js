@@ -15,6 +15,18 @@ export const GS_TYPES = {
   column: 'column',
 }
 
+export const TYPES_NEW = {
+  // Layout
+  section: 'dm-section', // Deprecated
+  column: 'dm-column', // Deprecated
+  row: 'dm-row', // Deprecated
+  row_2: 'dm-row-2',
+  column_2: 'dm-column-2',
+  grid: 'dm-grid',
+  gridItem: 'dm-grid-item',
+
+}
+
 export const MAX_COLUMNS = 12
 
 export const ACTIONS = {
