@@ -1,6 +1,6 @@
 import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
 
-export default (domComponents, { editor, ...config }) => {
+export default (domComponents, { ...config }) => {
   const { rowProps = {} } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
@@ -10,25 +10,11 @@ export default (domComponents, { editor, ...config }) => {
     model: {
       defaults: {
         name: 'Columns',
-        tagName: 'tr',
         selectable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
         droppable: `[data-gs-type='${GS_TYPES.column}']`, // these components can be DROPPED INTO THIS one
       },
       init() {
-        editor.on('component:add', (component) => {
-          const parent = component && component.parent && component.parent()
-          const parentComponents = parent && parent.components && parent.components()
-
-          if (!parentComponents) return
-
-          const parentComponentCount = parentComponents.models && parentComponents.models.length
-
-          console.log('parentComponentCount', parentComponentCount)
-
-          // if (parentComponentCount > MAX_COLUMNS) component.remove()
-        })
-
         this.on('component:update:components', (component, components, update) => {
           const { action, index } = update
           if (
@@ -43,9 +29,6 @@ export default (domComponents, { editor, ...config }) => {
           }
         })
       },
-    },
-    isComponent() {
-      return false
     },
   }
 

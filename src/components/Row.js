@@ -1,4 +1,4 @@
-import { TYPES, GS_TYPES } from '../consts'
+import { TYPES, GS_TYPES, RESIZER_NONE } from '../consts'
 
 export default (domComponents, { ...config }) => {
   const { tableProps = {} } = config
@@ -10,24 +10,19 @@ export default (domComponents, { ...config }) => {
     model: {
       defaults: {
         name: 'Row',
-        tagName: 'table',
-        badgable: true,
-        selectable: true,
-        hoverable: true,
-        draggable: true, // this can be DRAGGED INTO THESE components
         droppable: false, // these components can be DROPPED INTO THIS one
-        resizable: { tl: 0, tc: 0, tr: 0, cr: 0, br: 0, bc: 1, bl: 0, cl: 0 },
+        resizable: { ...RESIZER_NONE, bc: 1 },
+        style: {
+          height: '100px'
+        },
         ...config.rowProps,
       },
-    },
-    isComponent() {
-      return false
     },
   }
 
   // Force default styles
   const { styles = '', attributes } = def.model.defaults
-  const defaultStyles = ` [data-gs-type="${gsType}"] { display:table; width:100%; table-layout:fixed; }`
+  const defaultStyles = ` [data-gs-type="${gsType}"] { display:table; width:100%;table-layout:fixed; }`
 
   def.model.defaults.styles = styles + defaultStyles
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': gsType }

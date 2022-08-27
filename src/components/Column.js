@@ -9,10 +9,8 @@ export default (domComponents, { editor, ...config }) => {
     extend: 'cell',
     model: {
       defaults: {
-        tagName: 'td',
         name: 'Column',
         draggable: `[data-gs-type="${GS_TYPES.columns}"]`, // this can be DRAGGED INTO THESE components
-        droppable: true, // these components can be DROPPED INTO THIS one
         resizable: {
           updateTarget: (el, rect, opt) => {
             editor.UndoManager.stop()
@@ -112,50 +110,42 @@ export default (domComponents, { editor, ...config }) => {
         ...config.columnProps,
       },
 
-      init() { 
+      init() {
 
         editor.on('component:selected', (comp) => {
-          
-          if(comp.get('type') == this.get('type')){
-            const pcomps = comp.parent() && comp.parent().components();
-            const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length-1];
 
-            if(pcomps.length == 1){
+          if (comp.get('type') == this.get('type')) {
+            const pcomps = comp.parent() && comp.parent().components();
+            const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1];
+
+            if (pcomps.length == 1) {
               comp.get('resizable').cr = false;
               comp.get('resizable').cl = false;
-            }else{
-              if(pcomps.models[0].cid == comp.cid){
+            } else {
+              if (pcomps.models[0].cid == comp.cid) {
                 comp.get('resizable').cr = true;
                 comp.get('resizable').cl = false;
-              }else if(pcomps.models[last].cid == comp.cid){
+              } else if (pcomps.models[last].cid == comp.cid) {
                 comp.get('resizable').cr = false;
                 comp.get('resizable').cl = true;
-              }else{
+              } else {
                 comp.get('resizable').cr = true;
                 comp.get('resizable').cl = true;
               }
             }
           }
         });
-        
 
       },
 
       setColumns(value) {
         if (!value) return
-        const attrs = this.getAttributes()
-        attrs['data-gs-columns'] = value
-        this.set('columns', value)
-        this.setAttributes(attrs)
+        this.addAttributes({ 'data-gs-columns': value })
       },
 
       getColumns() {
         const attributes = this.getAttributes()
-        const value = attributes['data-gs-columns']
-        let result = value
-        if (typeof trait === 'string' && !isNaN(parseInt(value))) result = parseInt(value)
-        const columns = this.get('columns')
-        return columns
+        return parseInt(attributes['data-gs-columns'])
       },
 
       setSizeClass(size) {
@@ -204,10 +194,6 @@ export default (domComponents, { editor, ...config }) => {
           return undefined
         }
       },
-    },
-
-    isComponent() {
-      return false
     },
   }
 
