@@ -1,4 +1,4 @@
-import { TYPES, GS_TYPES, RESIZER_NONE, MAX_COLUMNS, RESIZABLE_PROPS } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, MAX_COLUMNS, RESIZABLE_PROPS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   const { columnProps = {} } = config
@@ -16,32 +16,19 @@ export default (domComponents, { editor, ...config }) => {
             editor.UndoManager.stop()
             const { currentPos, handlerAttr } = opt.resizer
             const { x: currentX } = currentPos
-            const selected = editor.getSelected()
+            const selected = editor.getSelected() // el.__gjsv.model
 
             if (!selected) return
 
-            let startX = Number(selected.get(RESIZABLE_PROPS.startX))
-            if (!startX) {
-              startX = currentX
-              selected.set(RESIZABLE_PROPS.startX, startX)
-            }
+            let startX = Number(selected.get(RESIZABLE_PROPS.startX)) || currentX
+            selected.set(RESIZABLE_PROPS.startX, startX)
 
-            let prevX = Number(selected.get(RESIZABLE_PROPS.prevX))
-            if (!prevX) {
-              prevX = currentX
-              selected.set(RESIZABLE_PROPS.prevX, prevX)
-            }
+            let prevX = Number(selected.get(RESIZABLE_PROPS.prevX)) || currentX
+            selected.set(RESIZABLE_PROPS.prevX, prevX)
 
             let prevDirection = selected.get(RESIZABLE_PROPS.prevDirection)
-            let currentDirection = undefined
-
-            if (currentX > prevX) {
-              currentDirection = 'right'
-            } else if (currentX < prevX) {
-              currentDirection = 'left'
-            } else {
-              currentDirection = prevDirection
-            }
+            let currentDirection = currentX > prevX ? 'right' :
+              (currentX < prevX ? 'left' : prevDirection)
 
             if (currentDirection !== prevDirection) {
               startX = prevX
@@ -54,8 +41,7 @@ export default (domComponents, { editor, ...config }) => {
             const prevDeltaX = Number(selected.get(RESIZABLE_PROPS.prevDeltaX) || deltaX)
             const parent = selected.parent()
 
-            const parentEl = parent.getEl()
-            const oneColWidth = parentEl.offsetWidth / 12
+            const oneColWidth = parent.getEl().offsetWidth / MAX_COLUMNS
             const prevDiv = Math.trunc(prevDeltaX / oneColWidth)
             const div = Math.trunc(deltaX / oneColWidth)
             const mustBeChanged = div !== prevDiv
@@ -68,25 +54,17 @@ export default (domComponents, { editor, ...config }) => {
             if ((shrink || grow) && mustBeChanged) {
               const columnForChange = selected.getNextColumnForChange(side, grow)
               const components = parent && parent.components && parent.components()
-              if (!components) {
-                console.log('NO COMPONENTS')
-                return
-              }
-              const spanSum = components.models.reduce((sum, col) => {
-                sum += col.getSpan()
-                return sum
-              }, 0)
+              if (!components) return
+              const spanSum = components.models.reduce((sum, col) => sum += col.getSpan(), 0)
 
               editor.UndoManager.start()
 
-              if ((spanSum < 12 && grow) || columnForChange) {
-                const selectedNewSpan = selected.getNextSpan(grow)
-                selected.setSizeClass(selectedNewSpan)
+              if ((spanSum < MAX_COLUMNS && grow) || columnForChange) {
+                selected.setSizeClass(selected.getNextSpan(grow))
               }
 
-              if (columnForChange && spanSum === 12) {
-                const columnForChangeNewSpan = columnForChange.getNextSpan(!grow)
-                columnForChange.setSizeClass(columnForChangeNewSpan)
+              if (columnForChange && spanSum === MAX_COLUMNS) {
+                columnForChange.setSizeClass(columnForChange.getNextSpan(!grow))
               }
             }
             editor.UndoManager.stop()
@@ -96,7 +74,6 @@ export default (domComponents, { editor, ...config }) => {
             selected.set(RESIZABLE_PROPS.prevDeltaX, deltaX)
 
             if (opt.store == 1) {
-              const selected = editor.getSelected()
               selected.set(RESIZABLE_PROPS.startX, undefined)
               selected.set(RESIZABLE_PROPS.prevX, undefined)
               selected.set(RESIZABLE_PROPS.prevDirection, undefined)
@@ -111,31 +88,28 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       init() {
-
-        editor.on('component:selected', (comp) => {
-
-          if (comp.get('type') == this.get('type')) {
-            const pcomps = comp.parent() && comp.parent().components();
-            const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1];
+        this.on('change:status', (comp) => {
+          if (comp.changed.status === ACTIONS.selected) {
+            const pcomps = comp.parent() && comp.parent().components()
+            const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1]
 
             if (pcomps.length == 1) {
-              comp.get('resizable').cr = false;
-              comp.get('resizable').cl = false;
+              comp.get('resizable').cr = false
+              comp.get('resizable').cl = false
             } else {
               if (pcomps.models[0].cid == comp.cid) {
-                comp.get('resizable').cr = true;
-                comp.get('resizable').cl = false;
+                comp.get('resizable').cr = true
+                comp.get('resizable').cl = false
               } else if (pcomps.models[last].cid == comp.cid) {
-                comp.get('resizable').cr = false;
-                comp.get('resizable').cl = true;
+                comp.get('resizable').cr = false
+                comp.get('resizable').cl = true
               } else {
-                comp.get('resizable').cr = true;
-                comp.get('resizable').cl = true;
+                comp.get('resizable').cr = true
+                comp.get('resizable').cl = true
               }
             }
           }
-        });
-
+        })
       },
 
       setColumns(value) {
@@ -153,8 +127,7 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       getSpan() {
-        const columns = this.getColumns() || MAX_COLUMNS
-        return columns
+        return this.getColumns() || MAX_COLUMNS
       },
 
       getNextSpan(isGrowing) {
@@ -176,9 +149,7 @@ export default (domComponents, { editor, ...config }) => {
 
         const columnsLength = parentsComponents.models.length
 
-        if (nextIndex < 0 || nextIndex >= columnsLength) {
-          return
-        }
+        if (nextIndex < 0 || nextIndex >= columnsLength) return
 
         const nextColumn = this.parent().getChildAt(nextIndex)
         if (!nextColumn) return

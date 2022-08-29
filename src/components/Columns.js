@@ -11,6 +11,7 @@ export default (domComponents, { ...config }) => {
       defaults: {
         name: 'Columns',
         selectable: false,
+        hoverable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
         droppable: `[data-gs-type='${GS_TYPES.column}']`, // these components can be DROPPED INTO THIS one
       },
