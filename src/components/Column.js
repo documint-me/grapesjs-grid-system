@@ -1,4 +1,4 @@
-import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, MAX_COLUMNS, RESIZABLE_PROPS } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, RESIZABLE_PROPS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   const { columnProps = {} } = config
@@ -17,6 +17,7 @@ export default (domComponents, { editor, ...config }) => {
             const { currentPos, handlerAttr } = opt.resizer
             const { x: currentX } = currentPos
             const selected = editor.getSelected() // el.__gjsv.model
+            const maxColumns = selected.getMaxColumns()
 
             if (!selected) return
 
@@ -41,7 +42,7 @@ export default (domComponents, { editor, ...config }) => {
             const prevDeltaX = Number(selected.get(RESIZABLE_PROPS.prevDeltaX) || deltaX)
             const parent = selected.parent()
 
-            const oneColWidth = parent.getEl().offsetWidth / MAX_COLUMNS
+            const oneColWidth = parent.getEl().offsetWidth / maxColumns
             const prevDiv = Math.trunc(prevDeltaX / oneColWidth)
             const div = Math.trunc(deltaX / oneColWidth)
             const mustBeChanged = div !== prevDiv
@@ -59,11 +60,11 @@ export default (domComponents, { editor, ...config }) => {
 
               editor.UndoManager.start()
 
-              if ((spanSum < MAX_COLUMNS && grow) || columnForChange) {
+              if ((spanSum < maxColumns && grow) || columnForChange) {
                 selected.setSizeClass(selected.getNextSpan(grow))
               }
 
-              if (columnForChange && spanSum === MAX_COLUMNS) {
+              if (columnForChange && spanSum === maxColumns) {
                 columnForChange.setSizeClass(columnForChange.getNextSpan(!grow))
               }
             }
@@ -122,19 +123,23 @@ export default (domComponents, { editor, ...config }) => {
         return parseInt(attributes['data-gs-columns'])
       },
 
+      getMaxColumns() {
+        return this.parent().parent().get('columns')
+      },
+
       setSizeClass(size) {
-        if (size > 0 && size <= MAX_COLUMNS) this.setColumns(size)
+        if (size > 0 && size <= this.getMaxColumns()) this.setColumns(size)
       },
 
       getSpan() {
-        return this.getColumns() || MAX_COLUMNS
+        return this.getColumns() || this.getMaxColumns()
       },
 
       getNextSpan(isGrowing) {
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1
 
-        if (newSpan > 0 && newSpan <= MAX_COLUMNS) return newSpan
+        if (newSpan > 0 && newSpan <= this.getMaxColumns()) return newSpan
 
         return oldSpan
       },

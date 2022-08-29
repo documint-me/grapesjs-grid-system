@@ -1,4 +1,4 @@
-import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES } from '../consts'
 
 export default (domComponents, { ...config }) => {
   const { rowProps = {} } = config
@@ -26,7 +26,12 @@ export default (domComponents, { ...config }) => {
             addNewComponentHandler(component, components, index)
           }
           if (action === ACTIONS.removeComponent) {
-            removeComponentHandler(component, components, index, MAX_COLUMNS)
+            removeComponentHandler(
+              component,
+              components,
+              index,
+              component.parent().parent().get('columns')
+            )
           }
         })
       },
