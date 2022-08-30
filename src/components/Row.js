@@ -1,6 +1,6 @@
 import { TYPES, GS_TYPES, RESIZER_NONE, MAX_COLUMNS } from '../consts'
 
-export default (domComponents, { ...config }) => {
+export default (domComponents, { editor, ...config }) => {
   const { tableProps = {} } = config
   const type = tableProps.type || TYPES.row
   const gsType = GS_TYPES.row
@@ -19,15 +19,34 @@ export default (domComponents, { ...config }) => {
         },
         ...config.rowProps,
       },
+      init() {
+        this.on('change:columns', this.updateColumnStyles)
+        this.on('remove', () => this.updateColumnStyles(true))
+        this.updateColumnStyles()
+      },
       initTraits() {
         const tr = this.get('traits')
         tr.unshift({
           name: 'columns',
           type: 'number',
-          changeProp: 1
+          changeProp: 1,
+          min: MAX_COLUMNS,
         })
         this.set('traits', tr)
       },
+      updateColumnStyles(clean = false) {
+        const cols = this.get('columns')
+        const id = this.getId()
+        const css = editor.Css
+        for (let i = 0; i < cols; i++) {
+          !clean && css.setRule(`[data-gs-${id}-columns="${i + 1}"]`, {
+            width: `${(100 / cols) * (i + 1)}%`
+          })
+          clean && css.remove(
+            css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
+          )
+        }
+      }
     },
   }
 

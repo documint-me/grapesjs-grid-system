@@ -115,16 +115,20 @@ export default (domComponents, { editor, ...config }) => {
 
       setColumns(value) {
         if (!value) return
-        this.addAttributes({ 'data-gs-columns': value })
+        this.addAttributes({ [`data-gs-${this.getRowId()}-columns`]: value })
       },
 
       getColumns() {
         const attributes = this.getAttributes()
-        return parseInt(attributes['data-gs-columns'])
+        return parseInt(attributes[`data-gs-${this.getRowId()}-columns`])
       },
 
       getMaxColumns() {
         return this.parent().parent().get('columns')
+      },
+
+      getRowId() {
+        return this.parent().parent().getId()
       },
 
       setSizeClass(size) {
@@ -175,21 +179,7 @@ export default (domComponents, { editor, ...config }) => {
 
   // Force defaults
   const { attributes = {}, styles = '' } = def.model.defaults
-  const defaultStyles = ` 
-    [data-gs-type="${gsType}"]{ vertical-align: inherit; overflow:hidden; word-break:break-word;}          
-    [data-gs-columns="1"] {width: 8.3333%;}          
-    [data-gs-columns="2"] {width: 16.6666%;}          
-    [data-gs-columns="3"] {width: 25%;}          
-    [data-gs-columns="4"] {width: 33.3333%;}          
-    [data-gs-columns="5"] {width: 41.6666%;}          
-    [data-gs-columns="6"] {width: 50%;}          
-    [data-gs-columns="7"] {width: 58.3333%;}          
-    [data-gs-columns="8"] {width: 66.6666%;}          
-    [data-gs-columns="9"] {width: 75%;}          
-    [data-gs-columns="10"] {width: 83.3333%;}          
-    [data-gs-columns="11"] {width: 91.6666%;}          
-    [data-gs-columns="12"] {width: 100%;}
-  `
+  const defaultStyles = ` [data-gs-type="${gsType}"]{ vertical-align: inherit; overflow:hidden; word-break:break-word;}`
   def.model.defaults.styles = styles + defaultStyles
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': gsType }
 
