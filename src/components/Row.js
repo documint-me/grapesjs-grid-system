@@ -11,6 +11,7 @@ export default (domComponents, { editor, ...config }) => {
     model: {
       defaults: {
         name: 'Row',
+        lastColumns: MAX_COLUMNS,
         columns: MAX_COLUMNS,
         droppable: false, // these components can be DROPPED INTO THIS one
         resizable: { ...RESIZER_NONE, bc: 1 },
@@ -21,28 +22,46 @@ export default (domComponents, { editor, ...config }) => {
       },
       init() {
         this.on('change:columns', this.updateColumnStyles)
-        this.on('remove', () => this.updateColumnStyles(true))
+        this.on('component:remove:before', this.cleanColumnStyles)
         this.updateColumnStyles()
       },
       initTraits() {
         const tr = this.get('traits')
         tr.unshift({
           name: 'columns',
+          label: 'Max Columns',
           type: 'number',
           changeProp: 1,
-          min: MAX_COLUMNS,
+          min: 1,
+          max: 18,
         })
         this.set('traits', tr)
       },
-      updateColumnStyles(clean = false) {
+      updateColumnStyles() {
         const cols = this.get('columns')
+        const lastCols = this.get('lastColumns')
         const id = this.getId()
         const css = editor.Css
-        for (let i = 0; i < cols; i++) {
-          !clean && css.setRule(`[data-gs-${id}-columns="${i + 1}"]`, {
-            width: `${(100 / cols) * (i + 1)}%`
-          })
-          clean && css.remove(
+        for (let i = 0; i < Math.max(cols, lastCols); i++) {
+          if (i >= cols) {
+            css.remove(
+              css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
+            )
+          } else {
+            css.setRule(`[data-gs-${id}-columns="${i + 1}"]`, {
+              width: `${(100 / cols) * (i + 1)}%`
+            })
+          }
+          this.set('lastColumns', cols)
+        }
+      },
+      cleanColumnStyles() {
+        const cols = this.get('columns')
+        const lastCols = this.get('lastColumns')
+        const id = this.getId()
+        const css = editor.Css
+        for (let i = 0; i < Math.max(cols, lastCols); i++) {
+          css.remove(
             css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
           )
         }

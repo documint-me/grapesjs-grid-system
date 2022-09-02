@@ -23,17 +23,32 @@ export default (domComponents, { ...config }) => {
             action === ACTIONS.moveComponent ||
             action === ACTIONS.cloneComponent
           ) {
-            addNewComponentHandler(component, components, index)
+            addNewComponentHandler(
+              component,
+              components,
+              index,
+              this.getMaxColumns()
+            )
           }
           if (action === ACTIONS.removeComponent) {
             removeComponentHandler(
               component,
               components,
               index,
-              component.parent().parent().get('columns')
+              this.getMaxColumns()
             )
           }
         })
+        this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
+      },
+      resetColumns() {
+        resetComponentsHandler(this.components(), this.getMaxColumns())
+      },
+      getRow() {
+        return this.parent()
+      },
+      getMaxColumns() {
+        return this.parent().get('columns')
       },
     },
   }
@@ -52,12 +67,16 @@ export default (domComponents, { ...config }) => {
   domComponents.addType(componentType, def)
 }
 
-function addNewComponentHandler(component, components, index) {
+function addNewComponentHandler(component, components, index, maxColumns) {
   const { models } = components
+  if (models.length > maxColumns) {
+    return
+  }
   const oldComponents = [...models.slice(index + 1), ...models.slice(0, index).reverse()]
   let sizeLeft = true
   let oldComponentIndex = 0
 
+  component.setSizeClass(1)
   while (sizeLeft && oldComponentIndex < oldComponents.length) {
     const oldComponent = oldComponents[oldComponentIndex]
     const span = oldComponent.getSpan()
@@ -70,6 +89,18 @@ function addNewComponentHandler(component, components, index) {
     }
 
     oldComponentIndex++
+  }
+}
+
+function resetComponentsHandler(components, maxColumns) {
+  const { models } = components
+
+  for (let i = 0; i < Math.max(models.length, maxColumns); i++) {
+    if (i >= maxColumns) {
+      models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
+    } else if (i < maxColumns) {
+      models[i] && models[i].setSizeClass(1)
+    }
   }
 }
 
