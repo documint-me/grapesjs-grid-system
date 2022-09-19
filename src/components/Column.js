@@ -16,7 +16,7 @@ export default (domComponents, { editor, ...config }) => {
             editor.UndoManager.stop()
             const { currentPos, handlerAttr } = opt.resizer
             const { x: currentX } = currentPos
-            const selected = editor.getSelected() // el.__gjsv.model
+            const selected = el.__gjsv.model
             const maxColumns = selected.getMaxColumns()
 
             if (!selected) return
@@ -111,16 +111,19 @@ export default (domComponents, { editor, ...config }) => {
             }
           }
         })
+        const columns = this.getColumns()
+        columns && this.setColumns(columns)
       },
 
       setColumns(value) {
         if (!value) return
+        this.set('columns', value)
         this.addAttributes({ [`data-gs-${this.getRowId()}-columns`]: value })
       },
 
       getColumns() {
         const attributes = this.getAttributes()
-        return parseInt(attributes[`data-gs-${this.getRowId()}-columns`])
+        return this.get('columns') || parseInt(attributes[`data-gs-${this.getRowId()}-columns`])
       },
 
       getMaxColumns() {

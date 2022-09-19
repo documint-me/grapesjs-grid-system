@@ -17,21 +17,17 @@ export default (domComponents, { ...config }) => {
       },
       init() {
         this.on('component:update:components', (component, components, update) => {
+          if (!component.setSizeClass) return
           const { action, index } = update
-          if (
-            action === ACTIONS.addComponent ||
-            action === ACTIONS.moveComponent ||
-            action === ACTIONS.cloneComponent
-          ) {
-            addNewComponentHandler(
+          if (action === ACTIONS.removeComponent) {
+            removeComponentHandler(
               component,
               components,
               index,
               this.getMaxColumns()
             )
-          }
-          if (action === ACTIONS.removeComponent) {
-            removeComponentHandler(
+          } else {
+            addNewComponentHandler(
               component,
               components,
               index,
