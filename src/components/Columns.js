@@ -72,19 +72,23 @@ function addNewComponentHandler(component, components, index, maxColumns) {
   let sizeLeft = true
   let oldComponentIndex = 0
 
-  component.setSizeClass(1)
-  while (sizeLeft && oldComponentIndex < oldComponents.length) {
-    const oldComponent = oldComponents[oldComponentIndex]
-    const span = oldComponent.getSpan()
+  const componentSpan = component.getColumns()
 
-    if (span !== 1) {
-      const newSpan = Math.ceil(span / 2)
-      oldComponent.setSizeClass(span - newSpan)
-      component.setSizeClass(newSpan)
-      sizeLeft = false
+  if (!componentSpan) {
+    component.setSizeClass(1)
+    while (sizeLeft && oldComponentIndex < oldComponents.length) {
+      const oldComponent = oldComponents[oldComponentIndex]
+      const span = oldComponent.getSpan()
+
+      if (span !== 1) {
+        const newSpan = Math.ceil(span / 2)
+        oldComponent.setSizeClass(span - newSpan)
+        component.setSizeClass(newSpan)
+        sizeLeft = false
+      }
+
+      oldComponentIndex++
     }
-
-    oldComponentIndex++
   }
 }
 
