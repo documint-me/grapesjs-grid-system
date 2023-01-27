@@ -13,26 +13,37 @@ export default (domComponents, { ...config }) => {
         selectable: false,
         hoverable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
-        droppable: `[data-gs-type='${GS_TYPES.column}']`, // these components can be DROPPED INTO THIS one
+        droppable: `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}']`, // these components can be DROPPED INTO THIS one
       },
       init() {
         this.on('component:update:components', (component, components, update) => {
-          if (!component.setSizeClass) return
-          const { action, index } = update
-          if (action === ACTIONS.removeComponent) {
-            removeComponentHandler(
-              component,
-              components,
-              index,
-              this.getMaxColumns()
-            )
+          if (component.getAttributes()['data-gs-type'] === GS_TYPES.row) {
+            const { action, index } = update
+            if (action !== ACTIONS.removeComponent) {
+              const toHandle = JSON.parse(JSON.stringify(component.components().models[0].components()))
+              const el = component.getEl()
+              el && (el.style.display = 'none')
+              component.remove()
+              this.append(toHandle, { at: index })
+            }
           } else {
-            addNewComponentHandler(
-              component,
-              components,
-              index,
-              this.getMaxColumns()
-            )
+            if (!component.setSizeClass) return
+            const { action, index } = update
+            if (action === ACTIONS.removeComponent) {
+              removeComponentHandler(
+                component,
+                components,
+                index,
+                this.getMaxColumns()
+              )
+            } else {
+              addNewComponentHandler(
+                component,
+                components,
+                index,
+                this.getMaxColumns()
+              )
+            }
           }
         })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)

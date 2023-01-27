@@ -111,10 +111,6 @@ export default (domComponents, { editor, ...config }) => {
             }
           }
         })
-        this.on('mount', () => {
-          const columns = this.getColumns()
-          columns && this.setColumns(columns)
-        })
       },
 
       setColumns(value) {
