@@ -14,8 +14,16 @@ export default (editor, config = {}) => {
 
   editor.on("component:mount", (component) => {
     if (component.getAttributes()["data-gs-type"] === GS_TYPES.column) {
-      const columns = component.getColumns();
+      const columns = component.getColumns && component.getColumns();
       columns && component.setColumns(columns);
+      const parent = component.parent()
+      const cur = parent.components().length
+      const max = component.getMaxColumns && component.getMaxColumns()
+      if (max && cur > max) {
+        component.set('layerable', false)
+        component.set('selectable', false)
+        component.remove()
+      }
     }
     if (
       component.getAttributes()['data-gs-type'] === GS_TYPES.row &&

@@ -113,6 +113,11 @@ export default (domComponents, { editor, ...config }) => {
         })
       },
 
+      removeColumns() { 
+        this.removeAttributes(`data-gs-${this.getRowId()}-columns`)
+      },
+
+
       setColumns(value) {
         if (!value) return
         this.set('columns', value)

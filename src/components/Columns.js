@@ -20,11 +20,16 @@ export default (domComponents, { ...config }) => {
           if (component.getAttributes()['data-gs-type'] === GS_TYPES.row) {
             const { action, index } = update
             if (action !== ACTIONS.removeComponent) {
-              const toHandle = JSON.parse(JSON.stringify(component.components().models[0].components()))
+              component.set('layerable', false)
+              component.set('selectable', false)
+              const cols = component.components().models[0].components()
+              cols.each((col) => col.removeColumns())
+              const toHandle = JSON.parse(JSON.stringify(cols))
               const el = component.getEl()
               el && (el.style.display = 'none')
               component.remove()
               this.append(toHandle, { at: index })
+              this.resetColumns()
             }
           } else {
             if (!component.setSizeClass) return
@@ -87,19 +92,20 @@ function addNewComponentHandler(component, components, index, maxColumns) {
 
   if (!componentSpan) {
     component.setSizeClass(1)
-    while (sizeLeft && oldComponentIndex < oldComponents.length) {
-      const oldComponent = oldComponents[oldComponentIndex]
-      const span = oldComponent.getSpan()
+  }
 
-      if (span !== 1) {
-        const newSpan = Math.ceil(span / 2)
-        oldComponent.setSizeClass(span - newSpan)
-        component.setSizeClass(newSpan)
-        sizeLeft = false
-      }
+  while (sizeLeft && oldComponentIndex < oldComponents.length) {
+    const oldComponent = oldComponents[oldComponentIndex]
+    const span = oldComponent.getSpan()
 
-      oldComponentIndex++
+    if (span !== 1) {
+      const newSpan = Math.ceil(span / 2)
+      oldComponent.setSizeClass(span - newSpan)
+      component.setSizeClass(newSpan)
+      sizeLeft = false
     }
+
+    oldComponentIndex++
   }
 }
 
