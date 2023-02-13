@@ -15,6 +15,7 @@ export default (domComponents, { editor, ...config }) => {
         columns: MAX_COLUMNS,
         droppable: false, // these components can be DROPPED INTO THIS one
         resizable: { ...RESIZER_NONE, bc: 1 },
+        unstylable: ['padding'],
         style: {
           'min-height': '25px'
         },
@@ -23,6 +24,7 @@ export default (domComponents, { editor, ...config }) => {
       init() {
         this.on('change:columns', this.updateColumnStyles)
         this.on('component:remove:before', this.cleanColumnStyles)
+        this.addStyle({ 'border-collapse': 'collapse' })
         this.updateColumnStyles()
       },
       initTraits() {
