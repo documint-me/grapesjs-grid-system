@@ -126,11 +126,11 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       getMaxColumns() {
-        return this.parent()?.parent()?.get('columns')
+        return this.parent().parent().get('columns')
       },
 
       getRowId() {
-        return this.parent()?.parent()?.getId()
+        return this.parent().parent().getId()
       },
 
       setSizeClass(size) {
