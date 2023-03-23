@@ -113,28 +113,24 @@ export default (domComponents, { editor, ...config }) => {
         })
       },
 
-      removeColumns() { 
-        this.removeAttributes(`data-gs-${this.getRowId()}-columns`)
-      },
+      removeColumns() {},
 
 
       setColumns(value) {
         if (!value) return
         this.set('columns', value)
-        this.addAttributes({ [`data-gs-${this.getRowId()}-columns`]: value })
       },
 
       getColumns() {
-        const attributes = this.getAttributes()
-        return this.get('columns') || parseInt(attributes[`data-gs-${this.getRowId()}-columns`])
+        return this.get('columns')
       },
 
       getMaxColumns() {
-        return this.parent().parent().get('columns')
+        return this.parent()?.parent()?.get('columns')
       },
 
       getRowId() {
-        return this.parent().parent().getId()
+        return this.parent()?.parent()?.getId()
       },
 
       setSizeClass(size) {
