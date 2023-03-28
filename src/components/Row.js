@@ -28,9 +28,10 @@ export default (domComponents, { editor, ...config }) => {
         this.updateColumnStyles()
       },
       initTraits() {
+        const name = 'columns'
         const tr = this.get('traits')
         tr.unshift({
-          name: 'columns',
+          name,
           label: 'Max Columns',
           type: 'number',
           changeProp: 1,

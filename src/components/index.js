@@ -18,7 +18,8 @@ export default (editor, config = {}) => {
       columns && component.setColumns(columns);
       const parent = component.parent()
       const cur = parent.components().length
-      const max = parent.parent() && component.getMaxColumns && component.getMaxColumns()
+      const row = parent.parent()
+      const max = row && component.getMaxColumns && component.getMaxColumns()
       if (max && cur > max) {
         component.set('layerable', false)
         component.set('selectable', false)

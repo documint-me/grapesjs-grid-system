@@ -4,6 +4,7 @@ export default (domComponents, { ...config }) => {
   const { rowProps = {} } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
+  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}']`
 
   const def = {
     extend: 'row',
@@ -13,7 +14,7 @@ export default (domComponents, { ...config }) => {
         selectable: false,
         hoverable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
-        droppable: `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}']`, // these components can be DROPPED INTO THIS one
+        droppable, // these components can be DROPPED INTO THIS one
       },
       init() {
         this.on('component:update:components', (component, components, update) => {
@@ -49,6 +50,11 @@ export default (domComponents, { ...config }) => {
                 this.getMaxColumns()
               )
             }
+          }
+          if (components.length >= this.getMaxColumns()) {
+            this.set({ droppable: false })
+          } else {
+            this.set({ droppable })
           }
         })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
