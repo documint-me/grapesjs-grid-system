@@ -11,6 +11,7 @@ export default (domComponents, { editor, ...config }) => {
       defaults: {
         name: 'Column',
         draggable: `[data-gs-type="${GS_TYPES.columns}"]`, // this can be DRAGGED INTO THESE components
+        prevRowId: '',
         resizable: {
           updateTarget: (el, rect, opt) => {
             editor.UndoManager.stop()
@@ -89,36 +90,43 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       init() {
+        this.getRowId()
         this.on('change:status', (comp) => {
           if (comp.changed.status === ACTIONS.selected) {
-            const pcomps = comp.parent() && comp.parent().components()
-            const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1]
-
-            if (pcomps.length == 1) {
-              comp.get('resizable').cr = false
-              comp.get('resizable').cl = false
-            } else {
-              if (pcomps.models[0].cid == comp.cid) {
-                comp.get('resizable').cr = true
-                comp.get('resizable').cl = false
-              } else if (pcomps.models[last].cid == comp.cid) {
-                comp.get('resizable').cr = false
-                comp.get('resizable').cl = true
-              } else {
-                comp.get('resizable').cr = true
-                comp.get('resizable').cl = true
-              }
-            }
+            this.resetHandles(comp)
           }
         })
       },
 
-      removeColumns() {},
+      resetHandles(comp, row = true) {
+        const pcomps = comp.parent() && comp.parent().components()
+        const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1]
 
+        if (pcomps.length == 1 || !row) {
+          comp.get('resizable').cr = false
+          comp.get('resizable').cl = false
+        } else {
+          if (pcomps.models[0].cid == comp.cid) {
+            comp.get('resizable').cr = true
+            comp.get('resizable').cl = false
+          } else if (pcomps.models[last].cid == comp.cid) {
+            comp.get('resizable').cr = false
+            comp.get('resizable').cl = true
+          } else {
+            comp.get('resizable').cr = true
+            comp.get('resizable').cl = true
+          }
+        }
+      },
+
+      removeColumns(rowId) { 
+        this.removeAttributes(`data-gs-${rowId || this.getRowId()}-columns`)
+      },
 
       setColumns(value) {
         if (!value) return
         this.set('columns', value)
+        this.addAttributes({ [`data-gs-${this.getRowId()}-columns`]: value })
       },
 
       getColumns() {
@@ -130,7 +138,13 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       getRowId() {
-        return this.parent().parent().getId()
+        try {
+          const prevRowId = this.parent().parent().getId()
+          this.set({ prevRowId })
+          return prevRowId
+        } catch (error) {
+          return this.get('prevRowId')
+        }
       },
 
       setSizeClass(size) {
