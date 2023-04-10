@@ -117,12 +117,17 @@ function addNewComponentHandler(component, components, index, maxColumns) {
 
 function resetComponentsHandler(components, maxColumns) {
   const { models } = components
+  const len = models.length
+  const span = Math.floor(maxColumns / len)
+  let remainder = maxColumns % len
 
-  for (let i = 0; i < Math.max(models.length, maxColumns); i++) {
+  for (let i = 0; i < Math.max(len, maxColumns); i++) {
     if (i >= maxColumns) {
       models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
     } else if (i < maxColumns) {
-      models[i] && models[i].setSizeClass(1)
+      const left = Math.max(0, remainder)
+      models[i] && models[i].setSizeClass(left ? span + 1 : span)
+      remainder--
     }
   }
 }
