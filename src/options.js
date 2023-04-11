@@ -10,4 +10,6 @@ export default {
 
   columnBlock: {},
   columnProps: {},
+
+  useIds: false,
 }
