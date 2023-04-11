@@ -93,6 +93,7 @@ function addNewComponentHandler(component, components, index, maxColumns) {
   const oldComponents = [...models.slice(index + 1), ...models.slice(0, index).reverse()]
   let sizeLeft = true
   let oldComponentIndex = 0
+  let collectSpan = 0
 
   const componentSpan = component.getColumns()
 
@@ -104,11 +105,16 @@ function addNewComponentHandler(component, components, index, maxColumns) {
     const oldComponent = oldComponents[oldComponentIndex]
     const span = oldComponent.getSpan()
 
-    if (span !== 1) {
+    if (span > 3) {
       const newSpan = Math.ceil(span / 2)
       oldComponent.setSizeClass(span - newSpan)
       component.setSizeClass(newSpan)
       sizeLeft = false
+    } else if (span === 3) {
+      collectSpan++
+      oldComponent.setSizeClass(span - 1)
+      component.setSizeClass(collectSpan)
+      sizeLeft = collectSpan !== 2
     }
 
     oldComponentIndex++
