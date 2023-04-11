@@ -43,30 +43,33 @@ export default (domComponents, { editor, ...config }) => {
       updateColumnStyles() {
         const cols = this.get('columns')
         const lastCols = this.get('lastColumns')
+        const grid = cols * 2
         const id = this.getId()
         const css = editor.Css
-        for (let i = 0; i < Math.max(cols, lastCols); i++) {
-          if (i >= cols) {
+        for (let i = 0; i < Math.max(grid, lastCols * 2); i++) {
+          if (i >= grid) {
             css.remove(
-              css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
+              css.getRule(`[data-gs${config.useIds ? `-${id}` : ''}-columns="${i + 1}"]`)
             )
           } else {
-            css.setRule(`[data-gs-${id}-columns="${i + 1}"]`, {
-              width: `${(100 / cols) * (i + 1)}%`
+            css.setRule(`[data-gs${config.useIds ? `-${id}` : ''}-columns="${i + 1}"]`, {
+              width: `${(100 / grid) * (i + 1)}%`
             })
           }
           this.set('lastColumns', cols)
         }
       },
       cleanColumnStyles() {
-        const cols = this.get('columns')
-        const lastCols = this.get('lastColumns')
-        const id = this.getId()
-        const css = editor.Css
-        for (let i = 0; i < Math.max(cols, lastCols); i++) {
-          css.remove(
-            css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
-          )
+        if (config.useIds) {
+          const cols = this.get('columns')
+          const lastCols = this.get('lastColumns')
+          const id = this.getId()
+          const css = editor.Css
+          for (let i = 0; i < Math.max(cols * 2, lastCols * 2); i++) {
+            css.remove(
+              css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
+            )
+          }
         }
       }
     },

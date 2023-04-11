@@ -18,7 +18,7 @@ export default (domComponents, { editor, ...config }) => {
             const { currentPos, handlerAttr } = opt.resizer
             const { x: currentX } = currentPos
             const selected = el.__gjsv.model
-            const maxColumns = selected.getMaxColumns()
+            const maxColumns = selected.getMaxColumns() * 2
 
             if (!selected) return
 
@@ -120,13 +120,13 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       removeColumns(rowId) { 
-        this.removeAttributes(`data-gs-${rowId || this.getRowId()}-columns`)
+        config.useIds && this.removeAttributes(`data-gs-${rowId || this.getRowId()}-columns`)
       },
 
       setColumns(value) {
         if (!value) return
         this.set('columns', value)
-        this.addAttributes({ [`data-gs-${this.getRowId()}-columns`]: value })
+        this.addAttributes({ [`data-gs${config.useIds ? this.getRowId() : ''}-columns`]: value })
       },
 
       getColumns() {
@@ -148,18 +148,18 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       setSizeClass(size) {
-        if (size > 0 && size <= this.getMaxColumns()) this.setColumns(size)
+        if (size > 0 && size <= this.getMaxColumns() * 2) this.setColumns(size)
       },
 
       getSpan() {
-        return this.getColumns() || this.getMaxColumns()
+        return this.getColumns() || this.getMaxColumns() * 2
       },
 
       getNextSpan(isGrowing) {
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1
 
-        if (newSpan > 0 && newSpan <= this.getMaxColumns()) return newSpan
+        if (newSpan > 0 && newSpan <= this.getMaxColumns() * 2) return newSpan
 
         return oldSpan
       },
