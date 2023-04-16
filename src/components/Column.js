@@ -159,7 +159,7 @@ export default (domComponents, { editor, ...config }) => {
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1
 
-        if (newSpan > 1 && newSpan <= this.getMaxColumns() * 2) return newSpan
+        if (newSpan > 0 && newSpan <= this.getMaxColumns() * 2) return newSpan
 
         return oldSpan
       },
@@ -182,7 +182,7 @@ export default (domComponents, { editor, ...config }) => {
         const columnSpan = this.getSpan()
         const nextColumnSpan = nextColumn.getSpan()
 
-        if ((!isGrowing && columnSpan > 2) || (isGrowing && nextColumnSpan > 2)) {
+        if ((!isGrowing && columnSpan > 1) || (isGrowing && nextColumnSpan > 1)) {
           return nextColumn
         } else if (isGrowing) {
           return nextColumn.getNextColumnForChange(side, isGrowing)

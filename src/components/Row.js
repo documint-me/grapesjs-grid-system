@@ -17,7 +17,7 @@ export default (domComponents, { editor, ...config }) => {
         resizable: { ...RESIZER_NONE, bc: 1 },
         unstylable: ['padding'],
         style: {
-          'min-height': '25px'
+          'height': '150px'
         },
         ...config.rowProps,
       },

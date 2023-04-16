@@ -50,6 +50,7 @@ export default (domComponents, { ...config }) => {
                 this.getMaxColumns()
               )
             }
+            distributeMissing(components, this.getMaxColumns())
           }
           if (components.length >= this.getMaxColumns()) {
             this.set({ droppable: false })
@@ -58,6 +59,7 @@ export default (domComponents, { ...config }) => {
           }
         })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
+        this.resetColumns()
       },
       resetColumns() {
         resetComponentsHandler(this.components(), this.getMaxColumns())
@@ -83,6 +85,27 @@ export default (domComponents, { ...config }) => {
   def.model.defaults.attributes = { ...attributes, 'data-gs-type': gsType }
 
   domComponents.addType(componentType, def)
+}
+
+function distributeMissing(components, maxColumns) {
+  const { models } = components
+  const spanSum = models.reduce((sum, col) => sum += col.getSpan(), 0)
+  const maxGrid = maxColumns * 2
+
+  if (spanSum !== maxGrid) {
+    const less = maxGrid - spanSum
+    const len = models.length
+    const lostSpan = Math.floor(less / len)
+    let remainder = less % len 
+    console.log({ less, len, lostSpan, remainder })
+    for (let i = 0; i < len; i++) {
+      const left = Math.max(0, remainder)
+      const span = models[i].getSpan()
+      models[i] && models[i].setSizeClass(left ? span + lostSpan + 1 : span + lostSpan)
+      remainder--
+    }
+    return
+  }
 }
 
 function addNewComponentHandler(component, components, index, maxColumns) {
@@ -123,18 +146,22 @@ function addNewComponentHandler(component, components, index, maxColumns) {
 
 function resetComponentsHandler(components, maxColumns) {
   const { models } = components
-  const len = models.length
+  const spanSum = models.reduce((sum, col) => sum += col.getSpan(), 0)
   const maxGrid = maxColumns * 2
-  const span = Math.floor(maxGrid / len)
-  let remainder = maxGrid % len
 
-  for (let i = 0; i < Math.max(len, maxGrid); i++) {
-    if (i >= maxGrid) {
-      config.useIds && models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
-    } else if (i < maxGrid) {
-      const left = Math.max(0, remainder)
-      models[i] && models[i].setSizeClass(left ? span + 1 : span)
-      remainder--
+  if (spanSum !== maxGrid) {
+    const len = models.length
+    const span = Math.floor(maxGrid / len)
+    let remainder = maxGrid % len
+
+    for (let i = 0; i < Math.max(len, maxGrid); i++) {
+      if (i >= maxGrid) {
+        config.useIds && models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
+      } else if (i < maxGrid) {
+        const left = Math.max(0, remainder)
+        models[i] && models[i].setSizeClass(left ? span + 1 : span)
+        remainder--
+      }
     }
   }
 }
