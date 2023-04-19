@@ -100,12 +100,12 @@ export default (domComponents, { editor, ...config }) => {
 
       resetHandles(comp, row = true) {
         const pcomps = comp.parent() && comp.parent().components()
-        const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1]
 
-        if (pcomps.length == 1 || !row) {
+        if (!pcomps || pcomps.length == 1 || !row) {
           comp.get('resizable').cr = false
           comp.get('resizable').cl = false
-        } else {
+        } else if (pcomps) {
+          const last = Object.keys(pcomps.models)[Object.keys(pcomps.models).length - 1]
           if (pcomps.models[0].cid == comp.cid) {
             comp.get('resizable').cr = true
             comp.get('resizable').cl = false

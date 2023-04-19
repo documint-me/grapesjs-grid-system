@@ -97,7 +97,6 @@ function distributeMissing(components, maxColumns) {
     const len = models.length
     const lostSpan = Math.floor(less / len)
     let remainder = less % len 
-    console.log({ less, len, lostSpan, remainder })
     for (let i = 0; i < len; i++) {
       const left = Math.max(0, remainder)
       const span = models[i].getSpan()
