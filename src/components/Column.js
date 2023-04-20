@@ -95,8 +95,16 @@ export default (domComponents, { editor, ...config }) => {
           if (comp.changed.status === ACTIONS.selected) {
             this.resetHandles(comp)
             this.correctWidth()
+            this.setColumnAttr()
           }
         })
+      },
+      setColumnAttr() {
+        try {
+          this.addAttributes({ 'data-columns-id': this.parent().getId() })
+        } catch (error) {
+          // do nothing
+        }
       },
       correctWidth() {
         try {

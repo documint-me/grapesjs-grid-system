@@ -53,7 +53,7 @@ export default (domComponents, { ...config }) => {
             }
           }
           if (components.length >= this.getMaxColumns()) {
-            this.set({ droppable: false })
+            this.set({ droppable: `[data-columns-id=${this.getId()}]` })
           } else {
             const droppable = this.get('droppableEnabled')
             this.set({ droppable })
