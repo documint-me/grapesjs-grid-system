@@ -44,7 +44,6 @@ export default (domComponents, { ...config }) => {
                 this.getMaxColumns()
               )
             } else if (action) {
-              this.set({ usedColumns: components.length })
               addNewComponentHandler(
                 component,
                 components,
@@ -59,10 +58,6 @@ export default (domComponents, { ...config }) => {
             const droppable = this.get('droppableEnabled')
             this.set({ droppable })
           }
-        })
-        this.on('change:usedColumns', (_ , c) => {
-          console.log(c)
-          this.distributeColumns()
         })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
         this.resetColumns()

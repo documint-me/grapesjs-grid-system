@@ -94,10 +94,13 @@ export default (domComponents, { editor, ...config }) => {
         this.on('change:status', (comp) => {
           if (comp.changed.status === ACTIONS.selected) {
             this.resetHandles(comp)
+            this.correctWidth()
           }
         })
       },
-
+      correctWidth() {
+        this.parent().distributeColumns()
+      },
       resetHandles(comp, row = true) {
         const pcomps = comp.parent() && comp.parent().components()
 
