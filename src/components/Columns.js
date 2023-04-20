@@ -15,6 +15,7 @@ export default (domComponents, { ...config }) => {
         hoverable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
         droppable, // these components can be DROPPED INTO THIS one
+        droppableEnabled: droppable,
       },
       init() {
         this.on('component:update:components', (component, components, update) => {
@@ -42,7 +43,8 @@ export default (domComponents, { ...config }) => {
                 index,
                 this.getMaxColumns()
               )
-            } else {
+            } else if (action) {
+              this.set({ usedColumns: components.length })
               addNewComponentHandler(
                 component,
                 components,
@@ -50,16 +52,23 @@ export default (domComponents, { ...config }) => {
                 this.getMaxColumns()
               )
             }
-            distributeMissing(components, this.getMaxColumns())
           }
           if (components.length >= this.getMaxColumns()) {
             this.set({ droppable: false })
           } else {
+            const droppable = this.get('droppableEnabled')
             this.set({ droppable })
           }
         })
+        this.on('change:usedColumns', (_ , c) => {
+          console.log(c)
+          this.distributeColumns()
+        })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
         this.resetColumns()
+      },
+      distributeColumns() {
+        distributeMissing(this.components().models, this.getMaxColumns())
       },
       resetColumns() {
         resetComponentsHandler(this.components(), this.getMaxColumns())
@@ -88,19 +97,18 @@ export default (domComponents, { ...config }) => {
 }
 
 function distributeMissing(components, maxColumns) {
-  const { models } = components
-  const spanSum = models.reduce((sum, col) => sum += col.getSpan(), 0)
+  const spanSum = components.reduce((sum, col) => sum += col.getSpan(), 0)
   const maxGrid = maxColumns * 2
 
   if (spanSum !== maxGrid) {
     const less = maxGrid - spanSum
-    const len = models.length
+    const len = components.length
     const lostSpan = Math.floor(less / len)
     let remainder = less % len 
     for (let i = 0; i < len; i++) {
       const left = Math.max(0, remainder)
-      const span = models[i].getSpan()
-      models[i] && models[i].setSizeClass(left ? span + lostSpan + 1 : span + lostSpan)
+      const span = components[i].getSpan()
+      components[i] && components[i].setSizeClass(left ? span + lostSpan + 1 : span + lostSpan)
       remainder--
     }
     return
@@ -123,7 +131,9 @@ function addNewComponentHandler(component, components, index, maxColumns) {
     component.setSizeClass(2)
   }
 
-  while (sizeLeft && oldComponentIndex < oldComponents.length) {
+  const spanSum = [...oldComponents, component].reduce((sum, col) => sum += col.getSpan(), 0)
+
+  while (sizeLeft && oldComponentIndex < oldComponents.length && spanSum !== maxColumns * 2) {
     const oldComponent = oldComponents[oldComponentIndex]
     const span = oldComponent.getSpan()
 
@@ -141,6 +151,7 @@ function addNewComponentHandler(component, components, index, maxColumns) {
 
     oldComponentIndex++
   }
+  distributeMissing([...oldComponents, component], maxColumns)
 }
 
 function resetComponentsHandler(components, maxColumns) {
