@@ -4,7 +4,7 @@ export default (domComponents, { ...config }) => {
   const { rowProps = {} } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
-  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}']`
+  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}'], [data-dm-category=content], [data-gjs-type='dm-row-dynamic']`
 
   const def = {
     extend: 'row',

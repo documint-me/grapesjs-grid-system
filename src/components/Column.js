@@ -99,7 +99,11 @@ export default (domComponents, { editor, ...config }) => {
         })
       },
       correctWidth() {
-        this.parent().distributeColumns()
+        try {
+          this.parent().distributeColumns()
+        } catch (error) {
+          // do nothing
+        }
       },
       resetHandles(comp, row = true) {
         const pcomps = comp.parent() && comp.parent().components()
