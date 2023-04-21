@@ -12,4 +12,5 @@ export default {
   columnProps: {},
 
   useIds: false,
+  columnName: 'dm-column-2',
 }

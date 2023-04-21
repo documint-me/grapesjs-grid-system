@@ -1,10 +1,10 @@
 import { ACTIONS, TYPES, GS_TYPES } from '../consts'
 
 export default (domComponents, { ...config }) => {
-  const { rowProps = {} } = config
+  const { rowProps = {}, columnName } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
-  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}'], [data-dm-category=content], [data-gjs-type='dm-row-dynamic']`
+  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}'], [data-dm-category='content'], [data-gjs-type='dm-row-dynamic']`
 
   const def = {
     extend: 'row',
@@ -25,8 +25,11 @@ export default (domComponents, { ...config }) => {
               component.set('layerable', false)
               component.set('selectable', false)
               const cols = component.components().models[0].components()
-              cols.each((col) => col.removeColumns())
-              const toHandle = JSON.parse(JSON.stringify(cols))
+              let toHandle = [{ type: columnName || TYPES.column }]
+              if (cols.length) {
+                cols.each((col) => col.removeColumns())
+                toHandle = JSON.parse(JSON.stringify(cols))
+              }
               const el = component.getEl()
               el && (el.style.display = 'none')
               component.remove()
