@@ -34,7 +34,10 @@ export default (editor, config = {}) => {
       // component.parent().getAttributes()["data-gs-type"] === GS_TYPES.columns
     ) {
       const el = component.getEl();
-      el && (el.style.display = "none");
+      if (el) {
+        el.style.display = "none";
+        el.remove();
+      }
       component.remove();
     }
   });
