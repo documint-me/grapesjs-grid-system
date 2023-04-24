@@ -17,7 +17,7 @@ export default (domComponents, { editor, ...config }) => {
         resizable: { ...RESIZER_NONE, bc: 1 },
         unstylable: ['padding'],
         style: {
-          'height': '150px'
+          // 'height': '150px'
         },
         ...config.rowProps,
       },
@@ -48,12 +48,10 @@ export default (domComponents, { editor, ...config }) => {
         const css = editor.Css
         for (let i = 0; i < Math.max(grid, lastCols * 2); i++) {
           if (i >= grid) {
-            css.remove(
-              css.getRule(`[data-gs${config.useIds ? `-${id}` : ''}-columns="${i + 1}"]`)
-            )
+            css.remove(css.getRule(`[data-gs${config.useIds ? `-${id}` : ''}-columns="${i + 1}"]`))
           } else {
             css.setRule(`[data-gs${config.useIds ? `-${id}` : ''}-columns="${i + 1}"]`, {
-              width: `${(100 / grid) * (i + 1)}%`
+              width: `${(100 / grid) * (i + 1)}%`,
             })
           }
           this.set('lastColumns', cols)
@@ -66,12 +64,10 @@ export default (domComponents, { editor, ...config }) => {
           const id = this.getId()
           const css = editor.Css
           for (let i = 0; i < Math.max(cols * 2, lastCols * 2); i++) {
-            css.remove(
-              css.getRule(`[data-gs-${id}-columns="${i + 1}"]`)
-            )
+            css.remove(css.getRule(`[data-gs-${id}-columns="${i + 1}"]`))
           }
         }
-      }
+      },
     },
   }
 
