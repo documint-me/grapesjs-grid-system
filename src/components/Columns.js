@@ -1,4 +1,4 @@
-import { ACTIONS, TYPES, GS_TYPES } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
 
 export default (domComponents, { ...config }) => {
   const { rowProps = {}, columnName } = config
@@ -75,7 +75,11 @@ export default (domComponents, { ...config }) => {
         return this.parent()
       },
       getMaxColumns() {
-        return this.parent().get('columns')
+        try {
+          return this.parent().get('columns')
+        } catch (error) {
+          return MAX_COLUMNS
+        }
       },
     },
   }

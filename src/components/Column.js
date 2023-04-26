@@ -1,4 +1,4 @@
-import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, RESIZABLE_PROPS } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, RESIZABLE_PROPS, MAX_COLUMNS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
   const { columnProps = {} } = config
@@ -149,7 +149,11 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       getMaxColumns() {
-        return this.parent().parent().get('columns')
+        try {
+          return this.parent().parent().get('columns')
+        } catch (error) {
+          return MAX_COLUMNS
+        }
       },
 
       getRowId() {
