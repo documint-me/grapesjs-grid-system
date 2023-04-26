@@ -4,7 +4,8 @@ export default (domComponents, { ...config }) => {
   const { rowProps = {}, columnName } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
-  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}'], [data-dm-category='content'], [data-gjs-type='dm-row-dynamic']`
+  const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}'], [data-gjs-type='dm-row-dynamic']`
+  const droppableContent = `[data-gs-type='${GS_TYPES.column}'], [data-gs-type='${GS_TYPES.row}'], [data-dm-category='content'], [data-gjs-type='dm-row-dynamic']`
 
   const def = {
     extend: 'row',
@@ -55,15 +56,22 @@ export default (domComponents, { ...config }) => {
               )
             }
           }
-          if (components.length >= this.getMaxColumns()) {
-            this.set({ droppable: `[data-columns-id=${this.getId()}]` })
-          } else {
-            const droppable = this.get('droppableEnabled')
-            this.set({ droppable })
-          }
+          this.setDroppable(components)
         })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
         this.resetColumns()
+        this.setDroppable(this.components())
+      },
+      setDroppable(components) {
+        if (components.length === 0) {
+          this.set({ droppable: droppableContent })
+        }
+        else if (components.length >= this.getMaxColumns()) {
+          this.set({ droppable: `[data-columns-id=${this.getId()}]` })
+        } else {
+          const droppable = this.get('droppableEnabled')
+          this.set({ droppable })
+        }
       },
       distributeColumns() {
         distributeMissing(this.components().models, this.getMaxColumns())
