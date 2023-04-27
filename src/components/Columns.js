@@ -1,6 +1,6 @@
 import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
 
-export default (domComponents, { ...config }) => {
+export default (domComponents, { editor, ...config }) => {
   const { rowProps = {}, columnName } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
@@ -22,6 +22,7 @@ export default (domComponents, { ...config }) => {
           if (component.getAttributes()['data-gs-type'] === GS_TYPES.row) {
             const { action, index } = update
             if (action !== ACTIONS.removeComponent) {
+              editor.UndoManager.stop()
               component.set('layerable', false)
               component.set('selectable', false)
               const cols = component.components().models[0].components()
@@ -33,6 +34,7 @@ export default (domComponents, { ...config }) => {
               const el = component.getEl()
               el && (el.style.display = 'none')
               component.remove()
+              editor.UndoManager.start()
               this.append(toHandle, { at: index })
               this.resetColumns()
             }

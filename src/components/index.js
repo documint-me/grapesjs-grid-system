@@ -23,9 +23,11 @@ export default (editor, config = {}) => {
       row && columns && component.setColumns(columns);
       const max = row && component.getMaxColumns && component.getMaxColumns()
       if (max && cur > max) {
+        editor.UndoManager.stop()
         component.set('layerable', false)
         component.set('selectable', false)
         component.remove()
+        editor.UndoManager.start()
       }
     }
     if (
@@ -33,12 +35,14 @@ export default (editor, config = {}) => {
       !component.parent() 
       // component.parent().getAttributes()["data-gs-type"] === GS_TYPES.columns
     ) {
+      editor.UndoManager.stop()
       const el = component.getEl();
       if (el) {
         el.style.display = "none";
         el.remove();
       }
       component.remove();
+      editor.UndoManager.start()
     }
   });
 };
