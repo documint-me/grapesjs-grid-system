@@ -36,7 +36,16 @@ export default (domComponents, { editor, ...config }) => {
               component.remove()
               editor.UndoManager.start()
               this.append(toHandle, { at: index })
-              this.resetColumns()
+              if (cols.length > 1) {
+                this.resetColumns()
+              } else {
+                addNewComponentHandler(
+                  this.components().models[index],
+                  components,
+                  index,
+                  this.getMaxColumns()
+                )
+              }
             }
           } else {
             if (!component.setSizeClass) return
