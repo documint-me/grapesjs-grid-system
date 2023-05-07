@@ -11,6 +11,7 @@ export default (domComponents, { editor, ...config }) => {
     model: {
       defaults: {
         name: 'Columns',
+        icon: '<i class="gjs-badge__icon dm-icon dm-section"></i>',
         selectable: false,
         hoverable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
@@ -19,6 +20,7 @@ export default (domComponents, { editor, ...config }) => {
       },
       init() {
         this.on('component:update:components', (component, components, update) => {
+          // USING THIS SHOUKLD BE AVOIDED AS IT CAUSES ISSUES WITH UNDO MANAGER
           if (component.getAttributes()['data-gs-type'] === GS_TYPES.row) {
             const { action, index } = update
             if (action !== ACTIONS.removeComponent) {
@@ -32,7 +34,10 @@ export default (domComponents, { editor, ...config }) => {
                 toHandle = JSON.parse(JSON.stringify(cols))
               }
               const el = component.getEl()
-              el && (el.style.display = 'none')
+              if (el) {
+                el.style.display = 'none'
+                el.remove()
+              }
               component.remove()
               editor.UndoManager.start()
               this.append(toHandle, { at: index })
@@ -49,7 +54,7 @@ export default (domComponents, { editor, ...config }) => {
             }
           } else {
             if (!component.setSizeClass) return
-            const { action, index } = update
+            const { action, index, add } = update
             if (action === ACTIONS.removeComponent) {
               removeComponentHandler(
                 component,
@@ -57,7 +62,7 @@ export default (domComponents, { editor, ...config }) => {
                 index,
                 this.getMaxColumns()
               )
-            } else if (action) {
+            } else if (action || add) {
               addNewComponentHandler(
                 component,
                 components,
