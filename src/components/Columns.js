@@ -59,7 +59,7 @@ export default (domComponents, { editor, ...config }) => {
             this.resetColumns()
           } else {
             if (!component.setSizeClass) return
-            const { action, index, add } = update
+            const { action, index, add, temporary } = update
             if (action === ACTIONS.removeComponent) {
               removeComponentHandler(
                 component,
@@ -68,12 +68,20 @@ export default (domComponents, { editor, ...config }) => {
                 this.getMaxColumns()
               )
             } else if (action || add) {
+              const oldColumns = component.get('columnsModel')
+              // COMING FROM TEMPORARY ACTION
+              if (oldColumns && oldColumns !== this.getId()) {
+                const oldColsComp = editor.Components.getById(oldColumns)
+                oldColsComp && oldColsComp.distributeColumns()
+              }
               addNewComponentHandler(
                 component,
                 components,
                 index,
                 this.getMaxColumns()
               )
+            } else if (temporary) {
+              component.set('columnsModel', this.getId())
             }
           }
           this.setDroppable(components)

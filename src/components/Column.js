@@ -94,6 +94,7 @@ export default (domComponents, { editor, ...config }) => {
         this.on('change:status', (comp) => {
           if (comp.changed.status === ACTIONS.selected) {
             this.resetHandles(comp)
+            // FALLBACK TO CORRECT ALL COLUMN WIDTHS
             this.correctWidth()
             this.setColumnAttr()
           }
