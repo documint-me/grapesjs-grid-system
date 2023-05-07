@@ -52,6 +52,11 @@ export default (domComponents, { editor, ...config }) => {
                 )
               }
             }
+          } else if (component.getAttributes()['data-columns-reset'] === GS_TYPES.column) {
+            editor.UndoManager.stop()
+            component.removeAttributes('data-columns-reset')
+            editor.UndoManager.start()
+            this.resetColumns()
           } else {
             if (!component.setSizeClass) return
             const { action, index, add } = update
