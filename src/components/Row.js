@@ -16,9 +16,6 @@ export default (domComponents, { editor, ...config }) => {
         droppable: false, // these components can be DROPPED INTO THIS one
         resizable: { ...RESIZER_NONE, bc: 1 },
         unstylable: ['padding'],
-        style: {
-          // 'height': '150px'
-        },
         ...config.rowProps,
       },
       init() {
@@ -28,17 +25,19 @@ export default (domComponents, { editor, ...config }) => {
         this.updateColumnStyles()
       },
       initTraits() {
-        const name = 'columns'
-        const tr = this.get('traits')
-        tr.unshift({
-          name,
-          label: 'Max Columns',
-          type: 'number',
-          changeProp: 1,
-          min: 1,
-          max: 18,
-        })
-        this.set('traits', tr)
+        if (config.useIds) {
+          const name = 'columns'
+          const tr = this.get('traits')
+          tr.unshift({
+            name,
+            label: 'Max Columns',
+            type: 'number',
+            changeProp: 1,
+            min: 1,
+            max: 18,
+          })
+          this.set('traits', tr)
+        }
       },
       updateColumnStyles() {
         const cols = this.get('columns')

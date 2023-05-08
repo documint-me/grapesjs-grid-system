@@ -20,39 +20,7 @@ export default (domComponents, { editor, ...config }) => {
       },
       init() {
         this.on('component:update:components', (component, components, update) => {
-          // USING THIS SHOUKLD BE AVOIDED AS IT CAUSES ISSUES WITH UNDO MANAGER
-          if (component.getAttributes()['data-gs-type'] === GS_TYPES.row) {
-            const { action, index } = update
-            if (action !== ACTIONS.removeComponent) {
-              editor.UndoManager.stop()
-              component.set('layerable', false)
-              component.set('selectable', false)
-              const cols = component.components().models[0].components()
-              let toHandle = [{ type: columnName || TYPES.column }]
-              if (cols.length) {
-                cols.each((col) => col.removeColumns())
-                toHandle = JSON.parse(JSON.stringify(cols))
-              }
-              const el = component.getEl()
-              if (el) {
-                el.style.display = 'none'
-                el.remove()
-              }
-              component.remove()
-              editor.UndoManager.start()
-              this.append(toHandle, { at: index })
-              if (cols.length > 1) {
-                this.resetColumns()
-              } else {
-                addNewComponentHandler(
-                  this.components().models[index],
-                  components,
-                  index,
-                  this.getMaxColumns()
-                )
-              }
-            }
-          } else if (component.getAttributes()['data-columns-reset'] === GS_TYPES.column) {
+          if (component.getAttributes()['data-columns-reset'] === GS_TYPES.column) {
             editor.UndoManager.stop()
             component.removeAttributes('data-columns-reset')
             editor.UndoManager.start()

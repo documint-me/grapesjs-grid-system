@@ -15,36 +15,11 @@ export default (editor, config = {}) => {
   editor.on("component:mount", (component) => {
     if (component.getAttributes()["data-gs-type"] === GS_TYPES.column) {
       const parent = component.parent()
-      const cur = parent.components().length
       const row = parent.parent()
       const columns = component.getColumns && component.getColumns()
       component.removeColumns()
       !row && component.resetHandles(component, false)
       row && columns && component.setColumns(columns)
-      const max = row && component.getMaxColumns && component.getMaxColumns()
-      // THIS FALLBACK SHOULDN'T STILL BE REQUIRED
-      if (max && cur > max) {
-        editor.UndoManager.stop()
-        component.set('layerable', false)
-        component.set('selectable', false)
-        component.remove()
-        editor.UndoManager.start()
-      }
-    }
-    // THIS FALLBACK SHOULDN'T STILL BE REQUIRED
-    if (
-      component.getAttributes()['data-gs-type'] === GS_TYPES.row &&
-      !component.parent() 
-      // component.parent().getAttributes()["data-gs-type"] === GS_TYPES.columns
-    ) {
-      editor.UndoManager.stop()
-      const el = component.getEl()
-      if (el) {
-        el.style.display = 'none'
-        el.remove()
-      }
-      component.remove()
-      editor.UndoManager.start()
     }
   });
 };
