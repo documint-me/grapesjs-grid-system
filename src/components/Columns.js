@@ -11,7 +11,7 @@ export default (domComponents, { editor, ...config }) => {
     model: {
       defaults: {
         name: 'Columns',
-        icon: '<i class="gjs-badge__icon dm-icon dm-section"></i>',
+        icon: '<i class="gjs-badge__icon fa-kit fa-columns-1-1-1-1"></i>',
         selectable: false,
         hoverable: false,
         draggable: false, // this can be DRAGGED INTO THESE components
@@ -29,12 +29,7 @@ export default (domComponents, { editor, ...config }) => {
             if (!component.setSizeClass) return
             const { action, index, add, temporary } = update
             if (action === ACTIONS.removeComponent) {
-              removeComponentHandler(
-                component,
-                components,
-                index,
-                this.getMaxColumns()
-              )
+              removeComponentHandler(component, components, index, this.getMaxColumns())
             } else if (action || add) {
               const oldColumns = component.get('columnsModel')
               // COMING FROM TEMPORARY ACTION
@@ -42,12 +37,7 @@ export default (domComponents, { editor, ...config }) => {
                 const oldColsComp = editor.Components.getById(oldColumns)
                 oldColsComp && oldColsComp.distributeColumns()
               }
-              addNewComponentHandler(
-                component,
-                components,
-                index,
-                this.getMaxColumns()
-              )
+              addNewComponentHandler(component, components, index, this.getMaxColumns())
             } else if (temporary) {
               component.set('columnsModel', this.getId())
             }
