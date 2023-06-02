@@ -21,7 +21,6 @@ export default (domComponents, { editor, ...config }) => {
       init() {
         this.on('change:columns', this.updateColumnStyles)
         this.on('component:remove:before', this.cleanColumnStyles)
-        this.addStyle({ 'border-collapse': 'collapse' })
         this.updateColumnStyles()
       },
       initTraits() {
