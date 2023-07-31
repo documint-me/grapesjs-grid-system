@@ -88,7 +88,6 @@ export default (domComponents, { editor, ...config }) => {
         },
         ...config.columnProps,
       },
-
       init() {
         this.getRowId()
         this.on('change:status', (comp) => {
@@ -99,7 +98,9 @@ export default (domComponents, { editor, ...config }) => {
             this.setColumnAttr()
           }
         })
+        this.afterInit()
       },
+      afterInit() {},
       setColumnAttr() {
         try {
           this.addAttributes({ 'data-columns-id': this.parent().getId() })

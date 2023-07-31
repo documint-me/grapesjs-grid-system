@@ -90,7 +90,7 @@ export default (domComponents, { editor, ...config }) => {
 }
 
 function distributeMissing(components, maxColumns) {
-  const spanSum = components.reduce((sum, col) => sum += col.getSpan(), 0)
+  const spanSum = components.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
   const maxGrid = maxColumns * 2
 
   if (spanSum !== maxGrid) {
@@ -100,9 +100,11 @@ function distributeMissing(components, maxColumns) {
     let remainder = less % len 
     for (let i = 0; i < len; i++) {
       const left = Math.max(0, remainder)
-      const span = components[i].getSpan()
-      components[i] && components[i].setSizeClass(left ? span + lostSpan + 1 : span + lostSpan)
-      remainder--
+      if (components[i] && components[i].getSpan && components[i].setSizeClass) {
+        const span = components[i].getSpan()
+        components[i].setSizeClass(left ? span + lostSpan + 1 : span + lostSpan)
+        remainder--
+      }
     }
     return
   }
@@ -149,7 +151,7 @@ function addNewComponentHandler(component, components, index, maxColumns) {
 
 function resetComponentsHandler(components, maxColumns) {
   const { models } = components
-  const spanSum = models.reduce((sum, col) => sum += col.getSpan(), 0)
+  const spanSum = models.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
   const maxGrid = maxColumns * 2
 
   if (spanSum !== maxGrid) {
@@ -159,11 +161,13 @@ function resetComponentsHandler(components, maxColumns) {
 
     for (let i = 0; i < Math.max(len, maxGrid); i++) {
       if (i >= maxGrid) {
-        config.useIds && models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
+        false && models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
       } else if (i < maxGrid) {
         const left = Math.max(0, remainder)
-        models[i] && models[i].setSizeClass(left ? span + 1 : span)
-        remainder--
+        if (models[i] && models[i].setSizeClass) {
+          models[i].setSizeClass(left ? span + 1 : span)
+          remainder--
+        }
       }
     }
   }

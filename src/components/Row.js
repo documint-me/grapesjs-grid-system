@@ -22,7 +22,9 @@ export default (domComponents, { editor, ...config }) => {
         this.on('change:columns', this.updateColumnStyles)
         this.on('component:remove:before', this.cleanColumnStyles)
         this.updateColumnStyles()
+        this.afterInit()
       },
+      afterInit() {},
       initTraits() {
         if (config.useIds) {
           const name = 'columns'
