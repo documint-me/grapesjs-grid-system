@@ -126,11 +126,11 @@ function addNewComponentHandler(component, components, index, maxColumns) {
     component.setSizeClass(2)
   }
 
-  const spanSum = [...oldComponents, component].reduce((sum, col) => sum += col.getSpan(), 0)
+  const spanSum = [...oldComponents, component].reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
 
   while (sizeLeft && oldComponentIndex < oldComponents.length && spanSum !== maxColumns * 2) {
     const oldComponent = oldComponents[oldComponentIndex]
-    const span = oldComponent.getSpan()
+    const span = oldComponent.getSpan ? oldComponent.getSpan() : 0
 
     if (span > 3) {
       const newSpan = Math.ceil(span / 2)

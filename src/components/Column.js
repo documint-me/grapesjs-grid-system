@@ -57,7 +57,7 @@ export default (domComponents, { editor, ...config }) => {
               const columnForChange = selected.getNextColumnForChange(side, grow)
               const components = parent && parent.components && parent.components()
               if (!components) return
-              const spanSum = components.models.reduce((sum, col) => sum += col.getSpan(), 0)
+              const spanSum = components.models.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
 
               editor.UndoManager.start()
 
