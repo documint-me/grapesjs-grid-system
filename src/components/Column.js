@@ -12,6 +12,15 @@ export default (domComponents, { editor, ...config }) => {
         name: 'Column',
         draggable: `[data-gs-type="${GS_TYPES.columns}"]`, // this can be DRAGGED INTO THESE components
         prevRowId: '',
+        traits: [{
+          name: 'columns',
+          label: 'Width',
+          type: 'number',
+          placeholder: '1',
+          min: 1,
+          max: 23,
+          changeProp: true,
+        }],
         resizable: {
           updateTarget: (el, rect, opt) => {
             editor.UndoManager.stop()
@@ -98,9 +107,16 @@ export default (domComponents, { editor, ...config }) => {
             this.setColumnAttr()
           }
         })
+        this.on('change:columns', this.onColumnsChange)
         this.afterInit()
       },
       afterInit() {},
+      onColumnsChange() {
+        // if grow subtract columns from others
+        // if shrink, add columns to others
+        // ensure they all have atleast 1 width
+        this.setSizeClass(this.getColumns())
+      },
       setColumnAttr() {
         try {
           this.addAttributes({ 'data-columns-id': this.parent().getId() })
