@@ -13,8 +13,7 @@ export default (domComponents, { editor, ...config }) => {
         draggable: `[data-gs-type="${GS_TYPES.columns}"]`, // this can be DRAGGED INTO THESE components
         prevRowId: '',
         traits: [{
-          name: 'columns',
-          label: 'Width',
+          name: 'width',
           type: 'number',
           placeholder: '1',
           min: 1,
@@ -102,20 +101,19 @@ export default (domComponents, { editor, ...config }) => {
         this.on('change:status', (comp) => {
           if (comp.changed.status === ACTIONS.selected) {
             this.resetHandles(comp)
+            this.set('width', this.getColumns())
             // FALLBACK TO CORRECT ALL COLUMN WIDTHS
             this.correctWidth()
             this.setColumnAttr()
           }
         })
-        this.on('change:columns', this.onColumnsChange)
+        this.on('change:width', this.onWidthChange)
         this.afterInit()
       },
       afterInit() {},
-      onColumnsChange() {
-        // if grow subtract columns from others
-        // if shrink, add columns to others
-        // ensure they all have atleast 1 width
-        this.setSizeClass(this.getColumns())
+      onWidthChange() {
+        const width = parseInt(this.get('width'))
+        this.updateNeighbouringColumns(width)
       },
       setColumnAttr() {
         try {
@@ -199,6 +197,52 @@ export default (domComponents, { editor, ...config }) => {
         if (newSpan > 0 && newSpan <= this.getMaxColumns() * 2) return newSpan
 
         return oldSpan
+      },
+      updateNeighbouringColumns(width) {
+        const maxColumns = this.getMaxColumns() * 2
+        const columnIndex = this.index()
+
+        const parent = this.parent()
+        if (!parent) return
+
+        const columnComponents = parent.components()
+        if (!columnComponents) return
+
+        const { models } = columnComponents
+        const peerComponents = [...models.slice(columnIndex + 1), ...models.slice(0, columnIndex).reverse()]
+
+        const columnsLength = peerComponents.length
+
+        if (!columnsLength) return
+
+        const columnSpan = this.getSpan()
+
+        let delta = width - columnSpan
+
+        if (width > columnSpan) {
+          const maxPossibleWidth = maxColumns - columnsLength 
+          this.setSizeClass(width > maxPossibleWidth ? maxPossibleWidth : width)
+          if (width > maxPossibleWidth) {
+            for (let index = 0; index < peerComponents.length; index++) {
+              const component = peerComponents[index]
+              component.setSizeClass(1)
+            }
+          } else {
+            let index = 0
+            let sizeLeft = true
+            while (sizeLeft && index < peerComponents.length) {
+              const component = peerComponents[index]
+              const componentSpan = component.getSpan()
+              component.setSizeClass(componentSpan > delta ? componentSpan - delta : 1)
+              delta -= componentSpan > delta ? delta : componentSpan - 1
+              sizeLeft = delta > 0
+              index++
+            }
+          }
+        } else {
+          this.setSizeClass(width)
+          peerComponents[0].setSizeClass(peerComponents[0].getSpan() - delta)
+        }
       },
       getNextColumnForChange(side, isGrowing) {
         const columnIndex = this.index()
