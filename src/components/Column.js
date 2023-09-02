@@ -15,7 +15,7 @@ export default (domComponents, { editor, ...config }) => {
         traits: [{
           name: 'width',
           type: 'number',
-          placeholder: '1',
+          placeholder: '24',
           min: 1,
           max: 23,
           changeProp: true,
@@ -101,19 +101,26 @@ export default (domComponents, { editor, ...config }) => {
         this.on('change:status', (comp) => {
           if (comp.changed.status === ACTIONS.selected) {
             this.resetHandles(comp)
-            this.set('width', this.getColumns())
             // FALLBACK TO CORRECT ALL COLUMN WIDTHS
             this.correctWidth()
             this.setColumnAttr()
           }
         })
         this.on('change:width', this.onWidthChange)
+        this.on('change:columns', this.matchWidth)
         this.afterInit()
       },
       afterInit() {},
       onWidthChange() {
         const width = parseInt(this.get('width'))
-        this.updateNeighbouringColumns(width)
+        const columns = this.getColumns()
+        width !== columns && this.updateNeighbouringColumns(width)
+      },
+      matchWidth() {
+        const cols = this.getColumns()
+        this.set('width', cols)
+        const widthTrait = this.getTrait('width')
+        widthTrait && widthTrait.set('value', cols)
       },
       setColumnAttr() {
         try {
