@@ -113,8 +113,7 @@ export default (domComponents, { editor, ...config }) => {
       afterInit() {},
       onWidthChange() {
         const width = parseInt(this.get('width'))
-        const columns = this.getColumns()
-        width !== columns && this.updateNeighbouringColumns(width)
+        width !== this.getColumns() && this.updateNeighbouringColumns(width)
       },
       matchWidth() {
         const cols = this.getColumns()
