@@ -17,7 +17,7 @@ export default (domComponents, { editor, ...config }) => {
           type: 'number',
           placeholder: '24',
           min: 1,
-          max: 23,
+          max: 24,
           changeProp: true,
         }],
         resizable: {
@@ -220,7 +220,10 @@ export default (domComponents, { editor, ...config }) => {
 
         const columnsLength = peerComponents.length
 
-        if (!columnsLength) return
+        if (!columnsLength) {
+          this.setSizeClass(24)
+          return
+        }
 
         const columnSpan = this.getSpan()
 
