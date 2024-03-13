@@ -16,6 +16,7 @@ export const GS_TYPES = {
 }
 
 export const MAX_COLUMNS = 12
+export const MAX_GRID = 100
 
 export const ACTIONS = {
   addComponent: 'add-component',

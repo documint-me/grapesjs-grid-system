@@ -1,9 +1,14 @@
 import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, RESIZABLE_PROPS, MAX_COLUMNS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
-  const { columnProps = {} } = config
+  const { columnProps = {}, maxGrid } = config
   const type = columnProps.type || TYPES.column
   const gsType = GS_TYPES.column
+
+  const sizeClassStylesMap = {}
+  for (let i = 0; i < maxGrid; i++) {
+    sizeClassStylesMap[i+1] = `${(100 / maxGrid) * (i + 1)}%`
+  }
 
   const def = {
     extend: 'cell',
@@ -15,9 +20,9 @@ export default (domComponents, { editor, ...config }) => {
         traits: [{
           name: 'width',
           type: 'number',
-          placeholder: '24',
+          placeholder: '100',
           min: 1,
-          max: 24,
+          max: 100,
           changeProp: true,
         }],
         resizable: {
@@ -26,7 +31,7 @@ export default (domComponents, { editor, ...config }) => {
             const { currentPos, handlerAttr } = opt.resizer
             const { x: currentX } = currentPos
             const selected = el.__gjsv.model
-            const maxColumns = selected.getMaxColumns() * 2
+            const maxColumns = maxGrid
 
             if (!selected) return
 
@@ -157,14 +162,13 @@ export default (domComponents, { editor, ...config }) => {
         }
       },
 
-      removeColumns(rowId) { 
-        config.useIds && this.removeAttributes(`data-gs-${rowId || this.getRowId()}-columns`)
-      },
+      removeColumns() {},
 
       setColumns(value) {
         if (!value) return
         this.set('columns', value)
-        this.addAttributes({ [`data-gs${config.useIds ? this.getRowId() : ''}-columns`]: value })
+        this.addAttributes({ 'data-gs-columns': value })
+        this.addStyle({ width: sizeClassStylesMap[value] })
       },
 
       getColumns() {
@@ -190,23 +194,23 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       setSizeClass(size) {
-        if (size > 0 && size <= this.getMaxColumns() * 2) this.setColumns(size)
+        if (size > 0 && size <= maxGrid) this.setColumns(size)
       },
 
       getSpan() {
-        return this.getColumns() || this.getMaxColumns() * 2
+        return this.getColumns() || maxGrid
       },
 
       getNextSpan(isGrowing) {
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1
 
-        if (newSpan > 0 && newSpan <= this.getMaxColumns() * 2) return newSpan
+        if (newSpan > 0 && newSpan <= maxGrid) return newSpan
 
         return oldSpan
       },
       updateNeighbouringColumns(width) {
-        const maxColumns = this.getMaxColumns() * 2
+        const maxColumns = maxGrid
         const columnIndex = this.index()
 
         const parent = this.parent()

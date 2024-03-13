@@ -17,7 +17,6 @@ export default (editor, config = {}) => {
       const parent = component.parent()
       const row = parent.parent()
       const columns = component.getColumns && component.getColumns()
-      component.removeColumns()
       !row && component.resetHandles(component, false)
       row && columns && component.setColumns(columns)
     }

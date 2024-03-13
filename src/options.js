@@ -1,4 +1,4 @@
-import { BLOCKS } from './consts'
+import { BLOCKS, MAX_GRID } from './consts'
 
 export default {
   blocks: [BLOCKS.row, BLOCKS.column],
@@ -11,6 +11,6 @@ export default {
   columnBlock: {},
   columnProps: {},
 
-  useIds: false,
+  maxGrid: MAX_GRID,
   columnName: 'dm-column-2',
 }
