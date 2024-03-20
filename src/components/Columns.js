@@ -1,7 +1,7 @@
 import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
 
 export default (domComponents, { editor, ...config }) => {
-  const { rowProps = {}, maxGrid } = config
+  const { rowProps = {}, maxGrid, oldMaxGrid } = config
   const componentType = rowProps.type || TYPES.columns
   const gsType = GS_TYPES.columns
   const droppable = `[data-gs-type='${GS_TYPES.column}'], [data-dm-category='column'], [data-dm-category='content']`
@@ -60,7 +60,7 @@ export default (domComponents, { editor, ...config }) => {
         distributeMissing(this.components().models, maxGrid)
       },
       resetColumns() {
-        resetComponentsHandler(this.components(), maxGrid)
+        resetComponentsHandler(this.components(), maxGrid, oldMaxGrid)
       },
       getRow() {
         return this.parent()
@@ -148,11 +148,12 @@ function addNewComponentHandler(component, components, index, maxColumns, maxGri
   distributeMissing([...oldComponents, component], maxGrid)
 }
 
-function resetComponentsHandler(components, maxGrid) {
+function resetComponentsHandler(components, maxGrid, oldMaxGrid) {
   const { models } = components
   const spanSum = models.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
+  const isEqualToOldSpanSum = oldMaxGrid && spanSum === oldMaxGrid
 
-  if (spanSum !== maxGrid) {
+  if (!isEqualToOldSpanSum && spanSum !== maxGrid) {
     const len = models.length
     const span = Math.floor(maxGrid / len)
     let remainder = maxGrid % len
