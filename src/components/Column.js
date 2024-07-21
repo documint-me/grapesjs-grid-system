@@ -1,4 +1,9 @@
 import { ACTIONS, TYPES, GS_TYPES, RESIZER_NONE, RESIZABLE_PROPS, MAX_COLUMNS } from '../consts'
+//LEAVING LOG FUNCTION FOR NOW
+
+const log = (component, name = '', ...otherArgs) => {
+  console.log(`COLUMN [${component.getId()}] : ${name}`, ...otherArgs)
+}
 
 export default (domComponents, { editor, ...config }) => {
   const { columnProps = {}, maxGrid } = config
@@ -7,7 +12,7 @@ export default (domComponents, { editor, ...config }) => {
 
   const sizeClassStylesMap = {}
   for (let i = 0; i < maxGrid; i++) {
-    sizeClassStylesMap[i+1] = `${(100 / maxGrid) * (i + 1)}%`
+    sizeClassStylesMap[i + 1] = `${(100 / maxGrid) * (i + 1)}%`
   }
 
   const def = {
@@ -17,14 +22,16 @@ export default (domComponents, { editor, ...config }) => {
         name: 'Column',
         draggable: `[data-gs-type="${GS_TYPES.columns}"]`, // this can be DRAGGED INTO THESE components
         prevRowId: '',
-        traits: [{
-          name: 'width',
-          type: 'number',
-          placeholder: '100',
-          min: 1,
-          max: 100,
-          changeProp: true,
-        }],
+        traits: [
+          {
+            name: 'width',
+            type: 'number',
+            placeholder: '100',
+            min: 1,
+            max: 100,
+            changeProp: true,
+          },
+        ],
         resizable: {
           updateTarget: (el, rect, opt) => {
             editor.UndoManager.stop()
@@ -42,8 +49,7 @@ export default (domComponents, { editor, ...config }) => {
             selected.set(RESIZABLE_PROPS.prevX, prevX)
 
             let prevDirection = selected.get(RESIZABLE_PROPS.prevDirection)
-            let currentDirection = currentX > prevX ? 'right' :
-              (currentX < prevX ? 'left' : prevDirection)
+            let currentDirection = currentX > prevX ? 'right' : currentX < prevX ? 'left' : prevDirection
 
             if (currentDirection !== prevDirection) {
               startX = prevX
@@ -70,14 +76,12 @@ export default (domComponents, { editor, ...config }) => {
               const columnForChange = selected.getNextColumnForChange(side, grow)
               const components = parent && parent.components && parent.components()
               if (!components) return
-              const spanSum = components.models.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
+              const spanSum = components.models.reduce((sum, col) => (sum += (col.getSpan && col.getSpan()) || 0), 0)
 
               editor.UndoManager.start()
-
               if ((spanSum < maxColumns && grow) || columnForChange) {
                 selected.setSizeClass(selected.getNextSpan(grow))
               }
-
               if (columnForChange && spanSum === maxColumns) {
                 columnForChange.setSizeClass(columnForChange.getNextSpan(!grow))
               }
@@ -102,6 +106,7 @@ export default (domComponents, { editor, ...config }) => {
         ...config.columnProps,
       },
       init() {
+        // log(this, 'init')
         this.getRowId()
         this.on('change:status', (comp) => {
           if (comp.changed.status === ACTIONS.selected) {
@@ -114,20 +119,24 @@ export default (domComponents, { editor, ...config }) => {
         })
         this.on('change:width', this.onWidthChange)
         this.on('change:columns', this.matchWidth)
-        this.afterInit()
       },
-      afterInit() {},
       onWidthChange() {
+        // log(this, 'onWidthChange')
         const width = parseInt(this.get('width'))
         width !== this.getColumns() && this.updateNeighbouringColumns(width)
       },
       matchWidth() {
+        // log(this, 'matchWidth')
         const cols = this.getColumns()
+        // console.log('cols before setiing', cols)
         this.set('width', cols)
         const widthTrait = this.getTrait('width')
         widthTrait && widthTrait.set('value', cols)
+        // console.log('matchWidth() \n', 'cols: ', cols, '\n widthTrait: ', widthTrait, ' \n ')
       },
       setColumnAttr() {
+        // log(this, 'setColumnAttr')
+
         try {
           this.addAttributes({ 'data-columns-id': this.parent().getId() })
         } catch (error) {
@@ -135,6 +144,7 @@ export default (domComponents, { editor, ...config }) => {
         }
       },
       correctWidth() {
+        // log(this, 'correctWidth')
         try {
           this.parent().distributeColumns()
         } catch (error) {
@@ -165,17 +175,21 @@ export default (domComponents, { editor, ...config }) => {
       removeColumns() {},
 
       setColumns(value) {
+        // log(this, 'setColumns')
         if (!value) return
         this.set('columns', value)
         this.addAttributes({ 'data-gs-columns': value })
         this.addStyle({ width: sizeClassStylesMap[value] })
+        // log(this, 'setColumns - END', value)
       },
 
       getColumns() {
+        // log(this, `getColumns`, this.get('columns'))
         return this.get('columns')
       },
 
       getMaxColumns() {
+        // console.log('COLUMN: getMaxColumns')
         try {
           return this.parent().parent().get('columns')
         } catch (error) {
@@ -194,14 +208,21 @@ export default (domComponents, { editor, ...config }) => {
       },
 
       setSizeClass(size) {
+        // log(this, 'setSizeClass', size)
         if (size > 0 && size <= maxGrid) this.setColumns(size)
       },
 
       getSpan() {
-        return this.getColumns() || maxGrid
+        // log(this, 'getSpan', this.getAttributes())
+        const attrs = this.getAttributes()
+        const width = attrs.width
+        const cols = this.getColumns()
+        log(this, 'getSpan', `cols: ${cols}`, `width: ${width}`)
+        return cols || (width && typeof width === 'string' && parseInt(width))|| maxGrid
       },
 
       getNextSpan(isGrowing) {
+        // log(this, 'getNextSpan')
         const oldSpan = this.getSpan()
         const newSpan = isGrowing ? oldSpan + 1 : oldSpan > 1 ? oldSpan - 1 : 1
 
@@ -210,6 +231,7 @@ export default (domComponents, { editor, ...config }) => {
         return oldSpan
       },
       updateNeighbouringColumns(width) {
+        // log(this, 'updateNeighbouringColumns')
         const maxColumns = maxGrid
         const columnIndex = this.index()
 
@@ -234,7 +256,7 @@ export default (domComponents, { editor, ...config }) => {
         let delta = width - columnSpan
 
         if (width > columnSpan) {
-          const maxPossibleWidth = maxColumns - columnsLength 
+          const maxPossibleWidth = maxColumns - columnsLength
           this.setSizeClass(width > maxPossibleWidth ? maxPossibleWidth : width)
           if (width > maxPossibleWidth) {
             for (let index = 0; index < peerComponents.length; index++) {
