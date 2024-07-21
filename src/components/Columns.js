@@ -1,4 +1,12 @@
-import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS } from '../consts'
+import { ACTIONS, TYPES, GS_TYPES, MAX_COLUMNS, MAX_GRID } from '../consts'
+//LEAVING LOG FUNCTION FOR NOW
+const log = (component, name = '', ...otherArgs) => {
+  if (component && component.getId) {
+    console.log(`COLUMNS [${component.getId()}] : ${name}`, ...otherArgs)
+  } else {
+    console.log(`COLUMNS [?] : ${name}`, ...otherArgs)
+  }
+}
 
 export default (domComponents, { editor, ...config }) => {
   const { rowProps = {}, maxGrid, oldMaxGrid } = config
@@ -19,7 +27,9 @@ export default (domComponents, { editor, ...config }) => {
         droppableEnabled: droppable,
       },
       init() {
+        // log(this, 'init', 'start')
         this.on('component:update:components', (component, components, update) => {
+          // log(this, 'component:update:components', update, component)
           if (component.getAttributes()['data-columns-reset'] === GS_TYPES.column) {
             editor.UndoManager.stop()
             component.removeAttributes('data-columns-reset')
@@ -43,6 +53,7 @@ export default (domComponents, { editor, ...config }) => {
             }
           }
           this.setDroppable(components)
+          // log(this, 'init', 'end')
         })
         this.listenTo(this.getRow(), 'change:columns', this.resetColumns)
         this.resetColumns()
@@ -57,15 +68,18 @@ export default (domComponents, { editor, ...config }) => {
         }
       },
       distributeColumns() {
+        // log(this, 'distributeColumns')
         distributeMissing(this.components().models, maxGrid)
       },
       resetColumns() {
         resetComponentsHandler(this.components(), maxGrid, oldMaxGrid)
       },
       getRow() {
+        // log(this, 'getRow')
         return this.parent()
       },
       getMaxColumns() {
+        // log(this, 'getMaxColumns')
         try {
           return this.parent().get('columns')
         } catch (error) {
@@ -90,13 +104,14 @@ export default (domComponents, { editor, ...config }) => {
 }
 
 function distributeMissing(components, maxGrid) {
-  const spanSum = components.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
+  // log(components, 'distributeMissing')
+  const spanSum = components.reduce((sum, col) => (sum += (col.getSpan && col.getSpan()) || 0), 0)
 
   if (spanSum !== maxGrid) {
     const less = maxGrid - spanSum
     const len = components.length
     const lostSpan = Math.floor(less / len)
-    let remainder = less % len 
+    let remainder = less % len
     for (let i = 0; i < len; i++) {
       const left = Math.max(0, remainder)
       if (components[i] && components[i].getSpan && components[i].setSizeClass) {
@@ -110,6 +125,7 @@ function distributeMissing(components, maxGrid) {
 }
 
 function addNewComponentHandler(component, components, index, maxColumns, maxGrid) {
+  // log(component, 'addNewComponentHandler')
   const { models } = components
   if (models.length > maxColumns) {
     return
@@ -125,7 +141,7 @@ function addNewComponentHandler(component, components, index, maxColumns, maxGri
     component.setSizeClass(2)
   }
 
-  const spanSum = [...oldComponents, component].reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
+  const spanSum = [...oldComponents, component].reduce((sum, col) => (sum += (col.getSpan && col.getSpan()) || 0), 0)
 
   while (sizeLeft && oldComponentIndex < oldComponents.length && spanSum !== maxGrid) {
     const oldComponent = oldComponents[oldComponentIndex]
@@ -149,30 +165,37 @@ function addNewComponentHandler(component, components, index, maxColumns, maxGri
 }
 
 function resetComponentsHandler(components, maxGrid, oldMaxGrid) {
+  // log(components, 'resetComponentsHandler')
   const { models } = components
-  const spanSum = models.reduce((sum, col) => sum += (col.getSpan && col.getSpan()) || 0, 0)
+  const spanSum = models.reduce((sum, col) => (sum += (col.getSpan && col.getSpan()) || 0), 0)
   const isEqualToOldSpanSum = oldMaxGrid && spanSum === oldMaxGrid
 
-  if (!isEqualToOldSpanSum && spanSum !== maxGrid) {
-    const len = models.length
-    const span = Math.floor(maxGrid / len)
-    let remainder = maxGrid % len
+  // log(null, 'resetComponentsHandler', { isEqualToOldSpanSum, spanSum, maxGrid, oldMaxGrid })
 
-    for (let i = 0; i < Math.max(len, maxGrid); i++) {
-      if (i >= maxGrid) {
-        false && models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
-      } else if (i < maxGrid) {
-        const left = Math.max(0, remainder)
-        if (models[i] && models[i].setSizeClass) {
-          models[i].setSizeClass(left ? span + 1 : span)
-          remainder--
-        }
-      }
-    }
+  if (!isEqualToOldSpanSum && spanSum !== maxGrid) {
+    // log(null, 'resetComponentsHandler', `cleanup`)
+    distributeMissing(components, MAX_GRID)
+    //COMMENTED OUJT ON Jul 20 2024
+    // const len = models.length
+    // const span = Math.floor(maxGrid / len)
+    // let remainder = maxGrid % len
+
+    // for (let i = 0; i < Math.max(len, maxGrid); i++) {
+    //   if (i >= maxGrid) {
+    //     false && models[i] && models[i].removeAttributes(`data-gs-${models[i].getRowId()}-columns`)
+    //   } else if (i < maxGrid) {
+    //     const left = Math.max(0, remainder)
+    //     if (models[i] && models[i].setSizeClass) {
+    //       models[i].setSizeClass(left ? span + 1 : span)
+    //       remainder--
+    //     }
+    //   }
+    // }
   }
 }
 
 function removeComponentHandler(component, components, index, maxColumns) {
+  // log(this, 'removeComponentHandler')
   if (!components) return
   const { length: componentsLength } = components
   if (componentsLength >= maxColumns) return
