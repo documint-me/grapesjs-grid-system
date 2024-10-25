@@ -29,7 +29,7 @@
     ]
   },
   "peerDependencies": {
-    "grapesjs": "0.18.x"
+    "grapesjs": ">=0.21.x < 1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
